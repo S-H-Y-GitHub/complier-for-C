@@ -76,7 +76,6 @@ public class Main
 					//字符常量
 					else if (buffer.substring(i, i + 1).matches("\'"))
 					{
-						//这里去除了错误检查
 						int j = 1;
 						for (; !buffer.substring(i + j, i + j + 1).matches("\'"); j++) ;
 						System.out.println("(字符\t" + buffer.substring(i, i + j + 1) + ")");
