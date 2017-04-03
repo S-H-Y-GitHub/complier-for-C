@@ -1,27 +1,21 @@
 package lexicalAnalyzer;
 
 
+import domain.Terminal;
+import javafx.util.Pair;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.Scanner;
-@Deprecated
-public class Main
+import java.util.LinkedList;
+import java.util.List;
+public class LexicalAnalyzer
 {
 	
-	public static void main(String[] args)
+	public List getSymbols(String filename)
 	{
 		String buffer;
-		String filename = "";
 		BufferedReader inputFile;
-		if (args.length == 1)
-			filename = args[0];
-		else
-		{
-			Scanner scan = new Scanner(System.in);
-			System.out.print("请输入C语言源程序的位置：");
-			if (scan.hasNextLine())
-				filename = scan.next();
-		}
+		List<Pair<Terminal, String>> symbols = new LinkedList<>();
 		try
 		{
 			inputFile = new BufferedReader(new FileReader(filename));
@@ -34,7 +28,7 @@ public class Main
 					//处理空白字符
 					if (buffer.substring(i, i + 1).matches("\\s"))
 						i++;
-					//处理单个的符号
+						//处理单个的符号
 					else if (buffer.substring(i, i + 1).matches("#|;|\\)|\\(|\\{|}|\\.|\\[|]|:|\\?"))
 					{
 						System.out.println("(\"" + buffer.substring(i, i + 1) + "\"\t" + buffer.substring(i, i + 1) + ")");
@@ -98,10 +92,12 @@ public class Main
 					}
 				}
 			}
+			return symbols;
 		}
 		catch (Exception e)
 		{
 			e.printStackTrace();
+			return null;
 		}
 	}
 }
