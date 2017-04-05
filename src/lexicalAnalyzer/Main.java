@@ -7,7 +7,7 @@ import java.util.Scanner;
 @Deprecated
 public class Main
 {
-	
+	@Deprecated
 	public static void main(String[] args)
 	{
 		String buffer;
@@ -72,7 +72,7 @@ public class Main
 						int j = 1;
 						for (; !buffer.substring(i + j, i + j + 1).matches("\""); j++) ;
 						System.out.println("(字符串\t" + buffer.substring(i, i + j + 1) + ")");
-						i = i + j + 2;
+						i = i + j + 1;
 					}
 					//字符常量
 					else if (buffer.substring(i, i + 1).matches("\'"))
@@ -80,7 +80,7 @@ public class Main
 						int j = 1;
 						for (; !buffer.substring(i + j, i + j + 1).matches("\'"); j++) ;
 						System.out.println("(字符\t" + buffer.substring(i, i + j + 1) + ")");
-						i = i + j + 2;
+						i = i + j + 1;
 					}
 					//标识符和关键字
 					else if (buffer.substring(i, i + 1).matches("[A-Za-z]"))

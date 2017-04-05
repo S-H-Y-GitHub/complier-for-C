@@ -28,10 +28,10 @@ public class LexicalAnalyzer
 					//处理空白字符
 					if (buffer.substring(i, i + 1).matches("\\s"))
 						i++;
-						//处理单个的符号
+					//处理单个的符号
 					else if (buffer.substring(i, i + 1).matches("#|;|\\)|\\(|\\{|}|\\.|\\[|]|:|\\?"))
 					{
-						System.out.println("(\"" + buffer.substring(i, i + 1) + "\"\t" + buffer.substring(i, i + 1) + ")");
+						symbols.add(new Pair<>(new Terminal(buffer.substring(i, i + 1)),buffer.substring(i, i + 1)));
 						i++;
 					}
 					//长度为二的符号
@@ -43,12 +43,12 @@ public class LexicalAnalyzer
 								|| buffer.substring(i, i + 2).matches("//") || buffer.substring(i, i + 2).matches("/\\*")
 								|| buffer.substring(i, i + 2).matches("\\*/"))
 						{
-							System.out.println("(\"" + buffer.substring(i, i + 2) + "\"\t" + buffer.substring(i, i + 2) + ")");
+							symbols.add(new Pair<>(new Terminal(buffer.substring(i, i + 2)),buffer.substring(i, i + 2)));
 							i = i + 2;
 						}
 						else
 						{
-							System.out.println("(\"" + buffer.substring(i, i + 1) + "\"\t" + buffer.substring(i, i + 1) + ")");
+							symbols.add(new Pair<>(new Terminal(buffer.substring(i, i + 1)),buffer.substring(i, i + 1)));
 							i++;
 						}
 					}
@@ -57,7 +57,7 @@ public class LexicalAnalyzer
 					{
 						int j = 1;
 						for (; buffer.substring(i + j, i + j + 1).matches("\\d"); j++) ;
-						System.out.println("(数字\t" + buffer.substring(i, i + j) + ")");
+						symbols.add(new Pair<>(new Terminal("数字"),buffer.substring(i, i + j)));
 						i = i + j;
 					}
 					//字符串常量
@@ -65,16 +65,16 @@ public class LexicalAnalyzer
 					{
 						int j = 1;
 						for (; !buffer.substring(i + j, i + j + 1).matches("\""); j++) ;
-						System.out.println("(字符串\t" + buffer.substring(i, i + j + 1) + ")");
-						i = i + j + 2;
+						symbols.add(new Pair<>(new Terminal("字符串"),buffer.substring(i, i + j + 1)));
+						i = i + j + 1;
 					}
 					//字符常量
 					else if (buffer.substring(i, i + 1).matches("\'"))
 					{
 						int j = 1;
 						for (; !buffer.substring(i + j, i + j + 1).matches("\'"); j++) ;
-						System.out.println("(字符\t" + buffer.substring(i, i + j + 1) + ")");
-						i = i + j + 2;
+						symbols.add(new Pair<>(new Terminal("字符"),buffer.substring(i, i + j + 1)));
+						i = i + j + 1;
 					}
 					//标识符和关键字
 					else if (buffer.substring(i, i + 1).matches("[A-Za-z]"))
@@ -85,9 +85,10 @@ public class LexicalAnalyzer
 						if (word.matches("auto|break|case|char|const|continue|default|do|double|else" +
 								"|enum|extern|float|for|goto|if|int|long|register|return|short|signed|sizeof" +
 								"|static|struct|switch|typedef|union|unsigned|void|volatile|while"))
-							System.out.println("(" + word.toUpperCase() + "\t" + word + ")");
+							symbols.add(new Pair<>(new Terminal(word.toUpperCase()),word));
+						
 						else
-							System.out.println("(标识符\t" + word + ")");
+							symbols.add(new Pair<>(new Terminal("标识符"),word));
 						i = i + j;
 					}
 				}
