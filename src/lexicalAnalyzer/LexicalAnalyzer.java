@@ -11,7 +11,7 @@ import java.util.List;
 public class LexicalAnalyzer
 {
 	
-	public List getSymbols(String filename)
+	public List<Pair<Terminal, String>> getSymbols(String filename)
 	{
 		String buffer;
 		BufferedReader inputFile;
