@@ -1,7 +1,7 @@
 package domain;
-import java.util.List;
+import java.util.LinkedList;
 public class Production
 {
 	public Variable left;
-	public List<Symbol> right;
+	public LinkedList<Symbol> right;
 }
