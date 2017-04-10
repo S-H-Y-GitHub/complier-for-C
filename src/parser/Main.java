@@ -1,6 +1,5 @@
 package parser;
 
-import com.sun.org.apache.bcel.internal.generic.GOTO;
 import domain.*;
 import javafx.util.Pair;
 import lexicalAnalyzer.LexicalAnalyzer;
@@ -10,7 +9,7 @@ public class Main
 {
 	public static void main(String[] args) throws Exception
 	{
-//		Grammar grammar = new Grammar();
+		Grammar grammar = new Grammar();
 		String filename = "";
 		if (args.length == 1)
 			filename = args[0];
@@ -27,11 +26,11 @@ public class Main
 		Stack<Symbol> x = new Stack<>(); //符号栈，用空格做为结束字符
 		s.push(0);
 		x.push(new Terminal(" "));
-		List<Production> productions = new ArrayList<>();// TODO: 2017/4/6 制作生成式
+		List<Production> productions = grammar.getProductions();
 		String action;
 		for(Pair<Terminal, String> t:laResult)
 		{
-			action = getAction(s.peek(), t.getKey());
+			action = grammar.getAction(s.peek(), t.getKey());
 			if(action == null)
 			{
 				System.err.println("不是规范的C语言程序或文法定义有误");
@@ -41,6 +40,7 @@ public class Main
 			{
 				x.push(t.getKey());
 				s.push(Integer.valueOf(action.replace("S","")));
+				System.out.println("移进"+t.toString());
 			}
 			else if(action.matches("r\\d+"))//规约
 			{
@@ -53,9 +53,12 @@ public class Main
 					for (int count = p.right.size();count>=0;count--)
 						s.pop();
 					x.push(p.left);
-					Integer newstate = getGoto(s.peek(), (Variable) x.peek());
-					if(newstate!=-1)
-						s.push(newstate);
+					Integer newState = grammar.getGoto(s.peek(), (Variable) x.peek());
+					if(newState!=-1)
+					{
+						s.push(newState);
+						System.out.println("规约"+p.toString());
+					}
 					else
 					{
 						System.err.println("不是规范的C语言程序或文法定义有误");
@@ -76,20 +79,5 @@ public class Main
 				return;
 			}
 		}
-	}
-	
-	private static String  getAction(int state, Terminal input)
-	{
-		HashMap<Terminal,List<String>> action;
-		action = new HashMap<>();
-		// TODO: 2017/4/6 完成action表,null表示空
-		return action.get(input).get(state);
-	}
-	private static int getGoto(int state, Variable input)
-	{
-		HashMap<Variable,List<Integer>> go;
-		go = new HashMap<>();
-		// TODO: 2017/4/6 完成goto表,-1表示空
-		return go.get(input).get(state);
 	}
 }

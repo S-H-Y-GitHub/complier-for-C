@@ -15,7 +15,27 @@ class Grammar
 		// TODO: 2017/3/27 编写C的文法产生式
 		productions = new LinkedList<>();
 	}
+	public List<Production> getProductions()
+	{
+		return productions;
+	}
 	
+	public String  getAction(int state, Terminal input)
+	{
+		HashMap<Terminal,List<String>> action;
+		action = new HashMap<>();
+		// TODO: 2017/4/6 完成action表,null表示空
+		return action.get(input).get(state);
+	}
+	public int getGoto(int state, Variable input)
+	{
+		HashMap<Variable,List<Integer>> go;
+		go = new HashMap<>();
+		// TODO: 2017/4/6 完成goto表,-1表示空
+		return go.get(input).get(state);
+	}
+	
+	@Deprecated
 	HashMap<Variable, Set<Terminal>> getFirst()
 	{
 		HashMap<Variable,Set<Terminal>> f = new HashMap<>();
@@ -42,6 +62,7 @@ class Grammar
 		}
 		return f;
 	}
+	@Deprecated
 	HashMap<Variable, Set<Terminal>> getFollow()
 	{
 		HashMap<Variable,Set<Terminal>> f = new HashMap<>();
