@@ -15,4 +15,9 @@ public class Production
 	{
 		return left.hashCode()+right.hashCode();
 	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		return this == obj || obj instanceof Production && left.equals(((Production) obj).left) && right.equals(((Production) obj).right);
+	}
 }

@@ -93,6 +93,7 @@ public class LexicalAnalyzer
 					}
 				}
 			}
+			symbols.add(new Pair<>(new Terminal("end"),null));
 			return symbols;
 		}
 		catch (Exception e)

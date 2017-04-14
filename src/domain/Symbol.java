@@ -18,4 +18,10 @@ public class Symbol
 	{
 		return s.hashCode()*2;
 	}
+	
+	@Override
+	public boolean equals(Object obj)
+	{
+		return (this.getClass()==obj.getClass() && s.equals(((Symbol)obj).s));
+	}
 }
