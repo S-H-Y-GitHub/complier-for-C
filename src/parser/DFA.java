@@ -51,13 +51,13 @@ public class DFA
 						checked = true;
 						break;
 					}
-				if(checked)
+				if (checked)
 					continue;
 				newState.add(temp);
 				//对这个节点求闭包
-				closure(state);
+				closure(newState);
 				//把这个状态加到DFA上
-				states.add(state);
+				states.add(newState);
 				//填状态转换表
 				transition.put(new Pair<>(state, change), states.size() - 1);
 				//递归遍历子节点的子节点
@@ -75,7 +75,10 @@ public class DFA
 	}
 	private void closure(Set<LR1Item> state)
 	{
-	
+		if (state.size() != 1)
+			throw new IllegalArgumentException("做为函数closure参数传入的必须是一个未完成闭包操作的状态");
+		LR1Item item = state.iterator().next();
+		//latest work here
 	}
 	public int getNext(Set state, Symbol input)
 	{

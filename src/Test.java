@@ -1,3 +1,4 @@
+import com.sun.corba.se.spi.orbutil.closure.Closure;
 import domain.Production;
 import domain.Symbol;
 import domain.Terminal;
@@ -45,8 +46,16 @@ public class Test
 		temp.lookaheads.add(new Terminal("end1"));
 		temp.dotPosition = 0;
 		c.add(temp);
-		System.out.println(a.equals(b));
-		System.out.println(a.equals(c));
-		System.out.println(b.equals(c));
+//		System.out.println(a.equals(b));
+//		System.out.println(a.equals(c));
+//		System.out.println(b.equals(c));
+		closure(new HashSet<>());
+	}
+	private static void closure(Set<LR1Item> state)
+	{
+		if (state.size() != 1)
+			throw new IllegalArgumentException("做为函数closure参数传入的必须是一个未完成闭包操作的状态集");
+		System.out.println("wtf");
+		
 	}
 }
