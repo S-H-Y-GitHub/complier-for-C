@@ -9,10 +9,12 @@ import java.util.*;
 public class DFA
 {
 	List<Set<LR1Item>> states;
-	Map<Pair<Set, Symbol>, Integer> transition;
+	Map<Pair<Set<LR1Item>, Symbol>, Integer> transition;
+	List<Production> productions;
 	
 	public DFA(List<Production> productions, Set<Terminal> terminals)
 	{
+		this.productions = productions;
 		states = new LinkedList<>();
 		Set<LR1Item> state = new HashSet<>();
 		LR1Item temp = new LR1Item();
@@ -37,24 +39,32 @@ public class DFA
 			if (item.dotPosition < item.production.right.size() - 1)
 			{
 				Symbol change = item.production.right.get(item.dotPosition);//收到这个输入之后
+				Pair<Set<LR1Item>, Symbol> key = new Pair<>(state, change);
 				Set<LR1Item> newState = new HashSet<>();//跳转到这个新状态
 				//完善这个新状态的信息
-				LR1Item temp = new LR1Item();
-				temp.production = item.production;
-				temp.lookaheads = item.lookaheads;
-				temp.dotPosition = item.dotPosition + 1;
+				for (LR1Item i : state)
+				{
+					if (i.production.right.get(item.dotPosition).equals(change))
+					{
+						LR1Item temp = new LR1Item();
+						temp.production = i.production;
+						temp.lookaheads = i.lookaheads;
+						temp.dotPosition = i.dotPosition + 1;
+						newState.add(temp);
+					}
+				}
 				//检查是否为已经生成过的状态节点
 				Boolean checked = false;
 				for (Set<LR1Item> finishedState : states)
-					if (finishedState.contains(temp))
+					if (finishedState.contains(newState.iterator().next()))
 					{
 						checked = true;
+						transition.put(new Pair<>(state, change), states.indexOf(finishedState));
 						break;
 					}
 				if (checked)
 					continue;
-				newState.add(temp);
-				//对这个节点求闭包
+				//没有被生成过,对这个状态求闭包
 				closure(newState);
 				//把这个状态加到DFA上
 				states.add(newState);
@@ -75,12 +85,12 @@ public class DFA
 	}
 	private void closure(Set<LR1Item> state)
 	{
-		if (state.size() != 1)
-			throw new IllegalArgumentException("做为函数closure参数传入的必须是一个未完成闭包操作的状态");
+		if (state.size() < 1)
+			throw new IllegalArgumentException("做为函数closure参数传入的必须是一个已经恰当初始化的状态");
 		LR1Item item = state.iterator().next();
-		//latest work here
+		
 	}
-	public int getNext(Set state, Symbol input)
+	public int getNext(Set<LR1Item> state, Symbol input)
 	{
 		return transition.get(new Pair<>(state, input));
 	}
