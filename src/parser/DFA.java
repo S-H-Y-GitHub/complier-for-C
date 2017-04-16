@@ -3,6 +3,7 @@ package parser;
 import domain.Production;
 import domain.Symbol;
 import domain.Terminal;
+import domain.Variable;
 import javafx.util.Pair;
 
 import java.util.*;
@@ -11,10 +12,13 @@ public class DFA
 	List<Set<LR1Item>> states;
 	Map<Pair<Set<LR1Item>, Symbol>, Integer> transition;
 	List<Production> productions;
+	HashMap<Variable,HashSet<Terminal>> first;
 	
-	public DFA(List<Production> productions, Set<Terminal> terminals)
+	public DFA(List<Production> productions, HashMap<Variable, HashSet<Terminal>> first)
 	{
 		this.productions = productions;
+		this.first = first;
+		
 		states = new LinkedList<>();
 		Set<LR1Item> state = new HashSet<>();
 		LR1Item temp = new LR1Item();
@@ -25,11 +29,6 @@ public class DFA
 		state.add(temp);
 		
 		buildDFA(state);
-		for (Terminal terminal : terminals)
-		{
-			Set<LR1Item> next = go(state, terminal);
-		}
-		
 	}
 	private void buildDFA(Set<LR1Item> state)
 	{
@@ -75,10 +74,7 @@ public class DFA
 			}
 		}
 	}
-	private int linkState(Set<LR1Item> state)
-	{
-		return 0;
-	}
+	
 	private Set<LR1Item> go(Set<LR1Item> state, Terminal terminal)
 	{
 		return null;
@@ -87,11 +83,57 @@ public class DFA
 	{
 		if (state.size() < 1)
 			throw new IllegalArgumentException("做为函数closure参数传入的必须是一个已经恰当初始化的状态");
-		LR1Item item = state.iterator().next();
-		
+		Boolean changed = true;
+		while (changed)
+		{
+			for (LR1Item item : state)
+			{
+				Symbol symbol = item.production.right.get(item.dotPosition);
+				for (Production p : productions)
+				{
+					if (p.left.equals(symbol))
+					{
+						LR1Item newItem = new LR1Item();
+						newItem.dotPosition = 0;
+						newItem.production = p;
+						if (item.dotPosition == item.production.right.size())
+							newItem.lookaheads = item.lookaheads;
+						else
+							newItem.lookaheads = first(item.production.right.get(item.dotPosition + 1));
+						//将新生成的表达式插入状态中
+						Boolean toAdd = false;
+						for (LR1Item item1 : state)
+						{
+							if (item1.production.equals(newItem.production) && item1.dotPosition.equals(newItem.dotPosition))
+							{
+								toAdd = true;
+								changed = item1.lookaheads.addAll(newItem.lookaheads);
+								break;
+							}
+						}
+						if (!toAdd)
+							state.add(newItem);
+					}
+				}
+			}
+		}
 	}
-	public int getNext(Set<LR1Item> state, Symbol input)
+	private HashSet<Terminal> first(Symbol symbol)
 	{
-		return transition.get(new Pair<>(state, input));
+		HashSet<Terminal> result = new HashSet<>();
+		if(symbol instanceof Terminal)
+		{
+			result.add((Terminal) symbol);
+			return result;
+		}
+		else if(first.get(symbol) != null)
+		{
+			return first.get(symbol);
+		}
+		else
+		{
+			// TODO: 2017/4/16
+			return null;
+		}
 	}
 }

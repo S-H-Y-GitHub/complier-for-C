@@ -1,38 +1,43 @@
 package parser;
 
 import domain.*;
+import javafx.util.Pair;
 
+import java.io.FileReader;
 import java.util.*;
 class Grammar
 {
 	List<Production> productions;
 	List<Variable> V;
 	List<Terminal> T;
-	HashMap<Variable, List<Variable>> first,follow;
+	HashMap<Variable, HashSet<Terminal>> first,follow;
+	HashMap<Pair<Variable,Integer>,Integer> go;
+	HashMap<Pair<Terminal,Integer>,String> action;
 	
 	Grammar()
 	{
-		// TODO: 2017/3/27 编写C的文法产生式
-		productions = new LinkedList<>();
+		productions = new LinkedList<>();// TODO: 2017/3/27 编写C的文法产生式
+		first = new HashMap<>();
+		DFA dfa = new DFA(productions, first);
+		List<Set<LR1Item>> states = dfa.states;
+		Map<Pair<Set<LR1Item>, Symbol>, Integer> transition = dfa.transition;
+		for(int i = 0;i<states.size();i++)
+		{
+		
+		}
 	}
 	public List<Production> getProductions()
 	{
 		return productions;
 	}
 	
-	public String  getAction(int state, Terminal input)
+	public String getAction(int state, Terminal input)
 	{
-		HashMap<Terminal,List<String>> action;
-		action = new HashMap<>();
-		// TODO: 2017/4/6 完成action表,null表示空
-		return action.get(input).get(state);
+		return action.get(new Pair<>(input,state));
 	}
-	public int getGoto(int state, Variable input)
+	public Integer getGoto(int state, Variable input)
 	{
-		HashMap<Variable,List<Integer>> go;
-		go = new HashMap<>();
-		// TODO: 2017/4/6 完成goto表,-1表示空
-		return go.get(input).get(state);
+		return go.get(new Pair<>(input,state));
 	}
 	
 	@Deprecated
@@ -73,6 +78,3 @@ class Grammar
 	}
 	
 }
-
-
-

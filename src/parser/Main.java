@@ -54,7 +54,7 @@ public class Main
 						s.pop();
 					x.push(p.left);
 					Integer newState = grammar.getGoto(s.peek(), (Variable) x.peek());
-					if(newState!=-1)
+					if(newState!=null)
 					{
 						s.push(newState);
 						System.out.println("规约"+p.toString());
