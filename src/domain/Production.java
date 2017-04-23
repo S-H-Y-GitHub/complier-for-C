@@ -5,6 +5,17 @@ public class Production
 	public Variable left;
 	public LinkedList<Symbol> right;
 	
+	public Production(Symbol... symbols)
+	{
+		right = new LinkedList<>();
+		for(int i = 0; i < symbols.length; i++)
+		{
+			if(i == 0)
+				left = (Variable) symbols[i];
+			else
+				right.add(symbols[i]);
+		}
+	}
 	@Override
 	public String toString()
 	{

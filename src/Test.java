@@ -4,6 +4,7 @@ import domain.Symbol;
 import domain.Terminal;
 import domain.Variable;
 import javafx.util.Pair;
+import parser.Grammar;
 import parser.LR1Item;
 
 import java.util.HashMap;
@@ -17,9 +18,6 @@ public class Test
 {
 	public static void main(String[] args)
 	{
-		HashMap<Integer,Integer> a  = new HashMap<>();
-		int c = a.get(0);
-		Integer d = a.put(0, 0);
-		System.out.println(d);
+		Grammar g = new Grammar();
 	}
 }

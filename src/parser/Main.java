@@ -9,7 +9,6 @@ public class Main
 {
 	public static void main(String[] args) throws Exception
 	{
-		Grammar grammar = new Grammar();
 		String filename = "";
 		if (args.length == 1)
 			filename = args[0];
@@ -24,8 +23,9 @@ public class Main
 		List<Pair<Terminal, String>> laResult = l.getSymbols(filename); //词法分析器的结果
 		Stack<Integer> s = new Stack<>(); //状态栈
 		Stack<Symbol> x = new Stack<>(); //符号栈，用空格做为结束字符
+		Grammar grammar = new Grammar();
 		s.push(0);
-		x.push(new Terminal(" "));
+		x.push(new Terminal("end"));
 		List<Production> productions = grammar.getProductions();
 		String action;
 		for(Pair<Terminal, String> t:laResult)

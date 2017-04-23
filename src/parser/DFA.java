@@ -12,12 +12,15 @@ public class DFA
 	List<Set<LR1Item>> states;
 	Map<Pair<Set<LR1Item>, Symbol>, Integer> transition;
 	List<Production> productions;
-	HashMap<Variable,HashSet<Terminal>> first;
+	HashMap<Variable, HashSet<Terminal>> first;
+	List<Variable> variables;
+	List<Terminal> terminals;
 	
-	public DFA(List<Production> productions, HashMap<Variable, HashSet<Terminal>> first)
+	public DFA(List<Production> productions, List<Variable> variables, List<Terminal> terminals)
 	{
 		this.productions = productions;
-		this.first = first;
+		this.variables = variables;
+		this.terminals = terminals;
 		
 		states = new LinkedList<>();
 		Set<LR1Item> state = new HashSet<>();
@@ -27,7 +30,7 @@ public class DFA
 		temp.lookaheads = new HashSet<>();
 		temp.lookaheads.add(new Terminal("end"));
 		state.add(temp);
-		
+		closure(state);
 		buildDFA(state);
 	}
 	private void buildDFA(Set<LR1Item> state)
@@ -35,7 +38,7 @@ public class DFA
 		//找出这个节点的子节点
 		for (LR1Item item : state)
 		{
-			if (item.dotPosition < item.production.right.size() - 1)
+			if (item.dotPosition < item.production.right.size())
 			{
 				Symbol change = item.production.right.get(item.dotPosition);//收到这个输入之后
 				Pair<Set<LR1Item>, Symbol> key = new Pair<>(state, change);
@@ -88,6 +91,8 @@ public class DFA
 		{
 			for (LR1Item item : state)
 			{
+				if(item.dotPosition == item.production.right.size())
+					continue;
 				Symbol symbol = item.production.right.get(item.dotPosition);
 				for (Production p : productions)
 				{
@@ -96,10 +101,10 @@ public class DFA
 						LR1Item newItem = new LR1Item();
 						newItem.dotPosition = 0;
 						newItem.production = p;
-						if (item.dotPosition == item.production.right.size())
+						if (item.dotPosition == item.production.right.size()-1)
 							newItem.lookaheads = item.lookaheads;
 						else
-							newItem.lookaheads = first(item.production.right.get(item.dotPosition + 1));
+							newItem.lookaheads = getFirst(item.production.right.get(item.dotPosition + 1));
 						//将新生成的表达式插入状态中
 						Boolean toAdd = false;
 						for (LR1Item item1 : state)
@@ -118,22 +123,55 @@ public class DFA
 			}
 		}
 	}
-	private HashSet<Terminal> first(Symbol symbol)
+	private HashSet<Terminal> getFirst(Symbol symbol)
 	{
-		HashSet<Terminal> result = new HashSet<>();
-		if(symbol instanceof Terminal)
+		if (symbol instanceof Terminal)
 		{
+			HashSet<Terminal> result = new HashSet<>();
 			result.add((Terminal) symbol);
 			return result;
 		}
-		else if(first.get(symbol) != null)
+		else if (first.get((Variable) symbol) != null)
 		{
 			return first.get(symbol);
 		}
 		else
 		{
-			// TODO: 2017/4/16
-			return null;
+			Boolean changed = true;
+			for (Variable v : variables)
+				first.put(v, new HashSet<>());
+			while (changed)
+			{
+				changed = false;
+				for (Production p : productions)
+				{
+					if (p.left.nullable)
+					{//可以为空
+						changed = first.get(p.left).add(new Terminal(""));
+					}
+					for (Symbol s : p.right)
+					{
+						if (s instanceof Terminal)
+						{
+							changed = first.get(p.left).add((Terminal) s);
+							break;
+						}
+						else if ((s instanceof Variable) && (((Variable) s).nullable))
+						{
+							HashSet<Terminal> temp = new HashSet<>(first.get((Variable) s));
+							temp.remove(new Terminal(""));
+							changed = first.get(p.left).addAll(temp);
+						}
+						else if (!((Variable) s).nullable)
+						{
+							changed = first.get(p.left).addAll(first.get((Variable) s));
+							break;
+						}
+					}
+					
+				}
+			}
+			return first.get(symbol);
 		}
 	}
 }
