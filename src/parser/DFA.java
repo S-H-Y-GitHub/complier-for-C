@@ -21,6 +21,7 @@ public class DFA
 		this.productions = productions;
 		this.variables = variables;
 		this.terminals = terminals;
+		this.first = new HashMap<>();
 		
 		states = new LinkedList<>();
 		Set<LR1Item> state = new HashSet<>();
@@ -89,23 +90,24 @@ public class DFA
 		Boolean changed = true;
 		while (changed)
 		{
-			for (LR1Item item : state)
+			for (int i = 0; i < state.size(); i++)
 			{
-				if(item.dotPosition == item.production.right.size())
+				LR1Item item = (LR1Item) state.toArray()[i];//当前扫描到的LR(1)项目
+				if (item.dotPosition == item.production.right.size())//如果这个项目已经是规约项目，就没得生成了
 					continue;
-				Symbol symbol = item.production.right.get(item.dotPosition);
+				Symbol symbol = item.production.right.get(item.dotPosition);//拿来扩充的变量，就是圆点之后的语法变量
 				for (Production p : productions)
 				{
-					if (p.left.equals(symbol))
+					if (p.left.equals(symbol))//找到一个需要加入状态中的产生式
 					{
 						LR1Item newItem = new LR1Item();
 						newItem.dotPosition = 0;
 						newItem.production = p;
-						if (item.dotPosition == item.production.right.size()-1)
+						if (item.dotPosition == item.production.right.size() - 1)
 							newItem.lookaheads = item.lookaheads;
 						else
 							newItem.lookaheads = getFirst(item.production.right.get(item.dotPosition + 1));
-						//将新生成的表达式插入状态中
+						//将新生成的LR(1)项目插入状态中
 						Boolean toAdd = false;
 						for (LR1Item item1 : state)
 						{
@@ -117,7 +119,10 @@ public class DFA
 							}
 						}
 						if (!toAdd)
-							state.add(newItem);
+						{
+							changed = state.add(newItem);
+							i = -1;
+						}
 					}
 				}
 			}
