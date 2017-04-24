@@ -21,7 +21,8 @@ public class DFA
 		this.productions = productions;
 		this.variables = variables;
 		this.terminals = terminals;
-		this.first = new HashMap<>();
+		first = new HashMap<>();
+		transition = new HashMap<>();
 		
 		states = new LinkedList<>();
 		Set<LR1Item> state = new HashSet<>();
@@ -32,9 +33,10 @@ public class DFA
 		temp.lookaheads.add(new Terminal("end"));
 		state.add(temp);
 		closure(state);
+		states.add(state);
 		buildDFA(state);
 	}
-	private void buildDFA(Set<LR1Item> state)
+	public void buildDFA(Set<LR1Item> state)
 	{
 		//找出这个节点的子节点
 		for (LR1Item item : state)
@@ -42,12 +44,12 @@ public class DFA
 			if (item.dotPosition < item.production.right.size())
 			{
 				Symbol change = item.production.right.get(item.dotPosition);//收到这个输入之后
-				Pair<Set<LR1Item>, Symbol> key = new Pair<>(state, change);
 				Set<LR1Item> newState = new HashSet<>();//跳转到这个新状态
 				//完善这个新状态的信息
 				for (LR1Item i : state)
 				{
-					if (i.production.right.get(item.dotPosition).equals(change))
+					if ((i.dotPosition < i.production.right.size())
+							&&(i.production.right.get(i.dotPosition).equals(change)))
 					{
 						LR1Item temp = new LR1Item();
 						temp.production = i.production;
@@ -58,8 +60,9 @@ public class DFA
 				}
 				//检查是否为已经生成过的状态节点
 				Boolean checked = false;
+				closure(newState);
 				for (Set<LR1Item> finishedState : states)
-					if (finishedState.contains(newState.iterator().next()))
+					if (finishedState.equals(newState))
 					{
 						checked = true;
 						transition.put(new Pair<>(state, change), states.indexOf(finishedState));
@@ -67,8 +70,6 @@ public class DFA
 					}
 				if (checked)
 					continue;
-				//没有被生成过,对这个状态求闭包
-				closure(newState);
 				//把这个状态加到DFA上
 				states.add(newState);
 				//填状态转换表
@@ -79,17 +80,14 @@ public class DFA
 		}
 	}
 	
-	private Set<LR1Item> go(Set<LR1Item> state, Terminal terminal)
-	{
-		return null;
-	}
-	private void closure(Set<LR1Item> state)
+	public void closure(Set<LR1Item> state)
 	{
 		if (state.size() < 1)
 			throw new IllegalArgumentException("做为函数closure参数传入的必须是一个已经恰当初始化的状态");
 		Boolean changed = true;
 		while (changed)
 		{
+			changed = false;
 			for (int i = 0; i < state.size(); i++)
 			{
 				LR1Item item = (LR1Item) state.toArray()[i];//当前扫描到的LR(1)项目
@@ -128,7 +126,7 @@ public class DFA
 			}
 		}
 	}
-	private HashSet<Terminal> getFirst(Symbol symbol)
+	public HashSet<Terminal> getFirst(Symbol symbol)
 	{
 		if (symbol instanceof Terminal)
 		{

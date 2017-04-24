@@ -18,6 +18,8 @@ public class Grammar
 		productions = new ArrayList<>();
 		variables = new LinkedList<>();
 		terminals = new LinkedList<>();
+		go = new HashMap<>();
+		action = new HashMap<>();
 		// TODO: 2017/3/27 编写C的文法产生式
 		Variable s = new Variable("S`",false);
 		Variable S = new Variable("S",false);
@@ -36,6 +38,7 @@ public class Grammar
 		Production p5 = new Production(R,L);
 		productions.addAll(Arrays.asList(p0, p1, p2, p3, p4, p5));
 		System.out.println(productions);
+		
 		DFA dfa = new DFA(productions, variables, terminals);
 		List<Set<LR1Item>> states = dfa.states;
 		Map<Pair<Set<LR1Item>, Symbol>, Integer> transition = dfa.transition;
@@ -46,7 +49,13 @@ public class Grammar
 			{
 				if(item.dotPosition == item.production.right.size())
 					for(Terminal terminal:item.lookaheads)
-						action.put(new Pair<>(terminal,i),"r"+productions.indexOf(item.production));
+					{
+						if(productions.indexOf(item.production)!=0)
+							action.put(new Pair<>(terminal,i),"r"+productions.indexOf(item.production));
+						else
+							action.put(new Pair<>(terminal,i),"acc");
+					}
+					
 			}
 			for(Terminal terminal : terminals)//处理移进
 			{
