@@ -22,6 +22,7 @@ public class Symbol
 	@Override
 	public boolean equals(Object obj)
 	{
-		return (this.getClass()==obj.getClass() && s.equals(((Symbol)obj).s));
+		Boolean result =(this == obj) || ((this.getClass()==obj.getClass()) && (s.equals(((Symbol)obj).s)));
+		return result;
 	}
 }

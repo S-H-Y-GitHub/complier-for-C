@@ -1,5 +1,6 @@
 package parser;
 
+import com.sun.istack.internal.NotNull;
 import domain.Production;
 import domain.Symbol;
 import domain.Terminal;
@@ -21,7 +22,6 @@ public class DFA
 		this.productions = productions;
 		this.variables = variables;
 		this.terminals = terminals;
-		first = new HashMap<>();
 		transition = new HashMap<>();
 		
 		states = new LinkedList<>();
@@ -49,7 +49,7 @@ public class DFA
 				for (LR1Item i : state)
 				{
 					if ((i.dotPosition < i.production.right.size())
-							&&(i.production.right.get(i.dotPosition).equals(change)))
+							&& (i.production.right.get(i.dotPosition).equals(change)))
 					{
 						LR1Item temp = new LR1Item();
 						temp.production = i.production;
@@ -62,12 +62,35 @@ public class DFA
 				Boolean checked = false;
 				closure(newState);
 				for (Set<LR1Item> finishedState : states)
-					if (finishedState.equals(newState))
+				{
+					if (finishedState.size() == newState.size() && finishedState.hashCode() == newState.hashCode())//使用equals方法会出现神秘bug，疑似java自身问题
 					{
-						checked = true;
-						transition.put(new Pair<>(state, change), states.indexOf(finishedState));
-						break;
+						boolean flag = false;
+						for (LR1Item lr1Item : newState)
+						{
+							flag = false;
+							for (LR1Item lr1Item1 : finishedState)
+							{
+								if (lr1Item.equals(lr1Item1))
+								{
+									flag = true;
+									break;
+								}
+							}
+							if (!flag)
+							{
+								checked = false;
+								break;
+							}
+						}
+						if(flag)
+						{
+							checked = true;
+							transition.put(new Pair<>(state, change), states.indexOf(finishedState));
+							break;
+						}
 					}
+				}
 				if (checked)
 					continue;
 				//把这个状态加到DFA上
@@ -99,7 +122,7 @@ public class DFA
 					if (p.left.equals(symbol))//找到一个需要加入状态中的产生式
 					{
 						LR1Item newItem = new LR1Item();
-						if(p.right.size()==1&&p.right.get(0).s.equals(""))//若为生成空
+						if (p.right.size() == 1 && p.right.get(0).s.equals(""))//若为生成空
 							newItem.dotPosition = 1;
 						else
 							newItem.dotPosition = 0;
@@ -129,6 +152,8 @@ public class DFA
 			}
 		}
 	}
+	
+	@NotNull
 	public HashSet<Terminal> getFirst(Symbol symbol)
 	{
 		if (symbol instanceof Terminal)
@@ -137,12 +162,13 @@ public class DFA
 			result.add((Terminal) symbol);
 			return result;
 		}
-		else if (first.get((Variable) symbol) != null)
+		else if (first != null)
 		{
-			return first.get(symbol);
+			return first.get((Variable) symbol);
 		}
 		else
 		{
+			first = new HashMap<>();
 			Boolean changed = true;
 			for (Variable v : variables)
 				first.put(v, new HashSet<>());
@@ -151,10 +177,6 @@ public class DFA
 				changed = false;
 				for (Production p : productions)
 				{
-					if (p.left.nullable)
-					{//可以为空
-						changed = first.get(p.left).add(new Terminal(""));
-					}
 					for (Symbol s : p.right)
 					{
 						if (s instanceof Terminal)
@@ -174,7 +196,6 @@ public class DFA
 							break;
 						}
 					}
-					
 				}
 			}
 			return first.get(symbol);

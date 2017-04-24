@@ -11,4 +11,17 @@ public class Variable extends Symbol {
 		this.s = s;
 		this.nullable=nullable;
 	}
+	
+	@Override
+	public int hashCode()
+	{
+		return super.hashCode()+nullable.hashCode();
+	}
+	@Override
+	public boolean equals(Object obj)
+	{
+		Boolean result = (this == obj) || ((obj instanceof Variable)
+				&& s.equals(((Variable)obj).s) && nullable.equals(((Variable)obj).nullable));
+		return result;
+	}
 }

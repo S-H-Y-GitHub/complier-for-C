@@ -18,6 +18,8 @@ public class LR1Item
 	@Override
 	public boolean equals(Object obj)
 	{
-		return obj == this || obj instanceof LR1Item && dotPosition.equals(((LR1Item) obj).dotPosition) && lookaheads.equals(((LR1Item) obj).lookaheads) && production.equals(((LR1Item) obj).production);
+		Boolean result = (obj == this) || ((obj instanceof LR1Item) && (dotPosition.equals(((LR1Item) obj).dotPosition))
+				&& (lookaheads.equals(((LR1Item) obj).lookaheads)) && (production.equals(((LR1Item) obj).production)));
+		return result;
 	}
 }

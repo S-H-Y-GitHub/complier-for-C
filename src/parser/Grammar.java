@@ -21,22 +21,23 @@ public class Grammar
 		go = new HashMap<>();
 		action = new HashMap<>();
 		{
-			Variable S = new Variable("S", false);
-			Variable A = new Variable("A", true);
-			Variable B = new Variable("B", false);
-			Variable ASSI = new Variable("ASSI", false);
-			Variable DECL = new Variable("DECL", false);
-			Variable TYPE = new Variable("TYPE", false);
-			Variable FOR = new Variable("FOR", false);
-			Variable IF = new Variable("IF", false);
-			Variable ELSE = new Variable("ELSE", true);
-			Variable EXPS = new Variable("EXPS", false);
-			Variable D = new Variable("D", true);
-			Variable C = new Variable("C", false);
-			Variable OP = new Variable("OP", false);
-			Variable BOOL = new Variable("BOOL", false);
-			Variable JUG = new Variable("JUG", false);
-			variables.addAll(Arrays.asList(S, A, B, ASSI, DECL, TYPE, FOR, IF, ELSE, EXPS, D, C, OP, BOOL, JUG));
+			Variable Sp = new Variable("$S`", false);
+			Variable S = new Variable("$S", false);
+			Variable A = new Variable("$A", true);
+			Variable B = new Variable("$B", false);
+			Variable ASSI = new Variable("$ASSI", false);
+			Variable DECL = new Variable("$DECL", false);
+			Variable TYPE = new Variable("$TYPE", false);
+			Variable FOR = new Variable("$FOR", false);
+			Variable IF = new Variable("$IF", false);
+			Variable ELSE = new Variable("$ELSE", true);
+			Variable EXPS = new Variable("$EXPS", false);
+			Variable D = new Variable("$D", true);
+			Variable C = new Variable("$C", false);
+			Variable OP = new Variable("$OP", false);
+			Variable BOOL = new Variable("$BOOL", false);
+			Variable JUG = new Variable("$JUG", false);
+			variables.addAll(Arrays.asList(Sp, S, A, B, ASSI, DECL, TYPE, FOR, IF, ELSE, EXPS, D, C, OP, BOOL, JUG));
 			Terminal id = new Terminal("标识符");
 			Terminal ret = new Terminal("RETURN");
 			Terminal num = new Terminal("数字");
@@ -66,6 +67,7 @@ public class Grammar
 			Terminal nq = new Terminal("!=");
 			terminals.addAll(Arrays.asList(id, ret, num, ls, rs, lb, rb, nul, sc, is, lm, rm, in, cha, fo, f, els,
 					str, chr, add, mius, mult, divi, eq, gt, lt, nq));
+			Production ps = new Production(Sp,S);
 			Production p0 = new Production(S, TYPE, id, ls, rs, lb, A, rb);
 			Production p1 = new Production(A, B, A);
 			Production p2 = new Production(A, nul);
@@ -99,7 +101,7 @@ public class Grammar
 			Production p30 = new Production(JUG, gt);
 			Production p31 = new Production(JUG, lt);
 			Production p32 = new Production(JUG, nq);
-			productions.addAll(Arrays.asList(p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16,
+			productions.addAll(Arrays.asList(ps,p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16,
 					p17, p18, p19, p20, p21, p22, p23, p24, p25, p26, p27, p28, p29, p30, p31, p32));
 		}
 		DFA dfa = new DFA(productions, variables, terminals);
