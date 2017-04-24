@@ -127,10 +127,27 @@ public class DFA
 						else
 							newItem.dotPosition = 0;
 						newItem.production = p;
-						if (item.dotPosition == item.production.right.size() - 1)
-							newItem.lookaheads = new HashSet<>(item.lookaheads);
-						else
-							newItem.lookaheads = new HashSet<>(getFirst(item.production.right.get(item.dotPosition + 1)));
+						newItem.lookaheads = new HashSet<>();
+						for(int j = item.dotPosition + 1; j <= item.production.right.size(); j++)
+						{
+							if (j == item.production.right.size())
+							{
+								newItem.lookaheads.addAll(item.lookaheads);
+								break;
+							}
+							else
+							{
+								Symbol smb = item.production.right.get(j);
+								if(smb instanceof Variable && ((Variable) smb).nullable)
+									newItem.lookaheads.addAll(getFirst(smb));
+								else if(smb.s.equals(""));
+								else
+								{
+									newItem.lookaheads.addAll(getFirst(smb));
+									break;
+								}
+							}
+						}
 						//将新生成的LR(1)项目插入状态中
 						Boolean toAdd = false;
 						for (LR1Item item1 : state)

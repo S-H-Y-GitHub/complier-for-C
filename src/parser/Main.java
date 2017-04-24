@@ -56,11 +56,13 @@ public class Main
 			{
 				Production p = productions.get(Integer.parseInt(action.replace("r", "")));
 				LinkedList<Symbol> stackTop = new LinkedList<>();
-				for (int count = p.right.size(); count > 0; count--)
+				int count = p.right.get(0).s.equals("")?0:p.right.size();
+				for (; count > 0; count--)
 					stackTop.push(x.pop());
-				if (stackTop.equals(p.right))
+				if (stackTop.equals(p.right) || (stackTop.size()==0&&p.right.get(0).s.equals("")))
 				{
-					for (int count = p.right.size(); count > 0; count--)
+					count = p.right.get(0).s.equals("")?0:p.right.size();
+					for (; count > 0; count--)
 						s.pop();
 					x.push(p.left);
 					Integer newState = grammar.getGoto(s.peek(), (Variable) x.peek());
