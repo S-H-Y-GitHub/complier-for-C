@@ -13,7 +13,7 @@ public class DFA
 	List<Set<LR1Item>> states;
 	Map<Pair<Set<LR1Item>, Symbol>, Integer> transition;
 	List<Production> productions;
-	HashMap<Variable, HashSet<Terminal>> first;
+	public HashMap<Variable, HashSet<Terminal>> first;
 	List<Variable> variables;
 	List<Terminal> terminals;
 	
@@ -53,7 +53,7 @@ public class DFA
 					{
 						LR1Item temp = new LR1Item();
 						temp.production = i.production;
-						temp.lookaheads = i.lookaheads;
+						temp.lookaheads = new HashSet<>(i.lookaheads);
 						temp.dotPosition = i.dotPosition + 1;
 						newState.add(temp);
 					}
@@ -128,9 +128,9 @@ public class DFA
 							newItem.dotPosition = 0;
 						newItem.production = p;
 						if (item.dotPosition == item.production.right.size() - 1)
-							newItem.lookaheads = item.lookaheads;
+							newItem.lookaheads = new HashSet<>(item.lookaheads);
 						else
-							newItem.lookaheads = getFirst(item.production.right.get(item.dotPosition + 1));
+							newItem.lookaheads = new HashSet<>(getFirst(item.production.right.get(item.dotPosition + 1)));
 						//将新生成的LR(1)项目插入状态中
 						Boolean toAdd = false;
 						for (LR1Item item1 : state)
@@ -138,13 +138,13 @@ public class DFA
 							if (item1.production.equals(newItem.production) && item1.dotPosition.equals(newItem.dotPosition))
 							{
 								toAdd = true;
-								changed = item1.lookaheads.addAll(newItem.lookaheads);
+								changed |= item1.lookaheads.addAll(newItem.lookaheads);
 								break;
 							}
 						}
 						if (!toAdd)
 						{
-							changed = state.add(newItem);
+							changed |= state.add(newItem);
 							i = -1;
 						}
 					}
@@ -179,20 +179,16 @@ public class DFA
 				{
 					for (Symbol s : p.right)
 					{
-						if (s instanceof Terminal)
+						if (s instanceof Terminal && !s.s.equals(""))
 						{
-							changed = first.get(p.left).add((Terminal) s);
+							changed |= first.get(p.left).add((Terminal) s);
 							break;
 						}
-						else if ((s instanceof Variable) && (((Variable) s).nullable))
+						else if ((s instanceof Variable) && ((Variable) s).nullable)
+							changed |= first.get(p.left).addAll(first.get((Variable) s));
+						else if ((s instanceof Variable) && !((Variable) s).nullable)
 						{
-							HashSet<Terminal> temp = new HashSet<>(first.get((Variable) s));
-							temp.remove(new Terminal(""));
-							changed = first.get(p.left).addAll(temp);
-						}
-						else if (!((Variable) s).nullable)
-						{
-							changed = first.get(p.left).addAll(first.get((Variable) s));
+							changed |= first.get(p.left).addAll(first.get((Variable) s));
 							break;
 						}
 					}

@@ -7,11 +7,14 @@ import java.io.FileReader;
 import java.util.*;
 public class Grammar
 {
-	List<Production> productions;
-	List<Variable> variables;
-	List<Terminal> terminals;
-	HashMap<Pair<Variable,Integer>,Integer> go;
-	HashMap<Pair<Terminal,Integer>,String> action;
+	public List<Production> productions;
+	public List<Variable> variables;
+	public List<Terminal> terminals;
+	public HashMap<Pair<Variable,Integer>,Integer> go;
+	public HashMap<Pair<Terminal,Integer>,String> action;
+	public Map<Pair<Set<LR1Item>, Symbol>, Integer> transition;
+	public List<Set<LR1Item>> states;
+	public HashMap<Variable, HashSet<Terminal>> first;
 	
 	public Grammar()
 	{
@@ -71,17 +74,17 @@ public class Grammar
 			Production p0 = new Production(S, TYPE, id, ls, rs, lb, A, rb);
 			Production p1 = new Production(A, B, A);
 			Production p2 = new Production(A, nul);
-			Production p3 = new Production(B, ret, EXPS);
+			Production p3 = new Production(B, ret, EXPS, sc);
 			Production p4 = new Production(B, IF);
 			Production p5 = new Production(B, FOR);
 			Production p6 = new Production(B, DECL);
 			Production p7 = new Production(B, ASSI);
-			Production p8 = new Production(ASSI, id, is, EXPS);
-			Production p9 = new Production(DECL, TYPE, id);
-			Production p10 = new Production(DECL, TYPE, lm, num, rm, id);
+			Production p8 = new Production(ASSI, id, is, EXPS, sc);
+			Production p9 = new Production(DECL, TYPE, id, sc);
+			Production p10 = new Production(DECL, TYPE, lm, num, rm, id, sc);
 			Production p11 = new Production(TYPE, in);
 			Production p12 = new Production(TYPE, cha);
-			Production p13 = new Production(FOR, fo, ls, ASSI, BOOL, ASSI, rs, lb, A, rb);
+			Production p13 = new Production(FOR, fo, ls, ASSI, BOOL, sc, ASSI, rs, lb, A, rb);
 			Production p14 = new Production(IF, f, ls, BOOL, rs, lb, A, rb, ELSE);
 			Production p15 = new Production(ELSE, els, lb, A, rb);
 			Production p16 = new Production(ELSE, nul);
@@ -105,8 +108,9 @@ public class Grammar
 					p17, p18, p19, p20, p21, p22, p23, p24, p25, p26, p27, p28, p29, p30, p31, p32));
 		}
 		DFA dfa = new DFA(productions, variables, terminals);
-		List<Set<LR1Item>> states = dfa.states;
-		Map<Pair<Set<LR1Item>, Symbol>, Integer> transition = dfa.transition;
+		states = dfa.states;
+		transition = dfa.transition;
+		first = dfa.first;
 		for(int i = 0;i<states.size();i++)
 		{
 			Set<LR1Item> state = states.get(i);

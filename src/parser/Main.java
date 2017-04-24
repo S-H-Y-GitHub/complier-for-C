@@ -1,6 +1,9 @@
 package parser;
 
-import domain.*;
+import domain.Production;
+import domain.Symbol;
+import domain.Terminal;
+import domain.Variable;
 import javafx.util.Pair;
 import lexicalAnalyzer.LexicalAnalyzer;
 
@@ -24,40 +27,48 @@ public class Main
 		Stack<Integer> s = new Stack<>(); //状态栈
 		Stack<Symbol> x = new Stack<>(); //符号栈，用空格做为结束字符
 		Grammar grammar = new Grammar();
+		HashMap<Pair<Variable,Integer>,Integer> go = grammar.go;
+		HashMap<Pair<Terminal,Integer>,String> action1 = grammar.action;
+		Map<Pair<Set<LR1Item>, Symbol>, Integer> transition = grammar.transition;
+		List<Set<LR1Item>> states = grammar.states;
+		HashMap<Variable, HashSet<Terminal>> first = grammar.first;
+		Arrays.asList(go,action1,transition,states,first);
 		s.push(0);
 		x.push(new Terminal("end"));
 		List<Production> productions = grammar.getProductions();
 		String action;
-		for(Pair<Terminal, String> t:laResult)
+		for (int i = 0; i<laResult.size();i++)
 		{
+			Pair<Terminal, String> t = laResult.get(i);
 			action = grammar.getAction(s.peek(), t.getKey());
-			if(action == null)
+			if (action == null)
 			{
 				System.err.println("不是规范的C语言程序或文法定义有误");
 				return;
 			}
-			else if(action.matches("S\\d+"))//移进
+			else if (action.matches("S\\d+"))//移进
 			{
 				x.push(t.getKey());
-				s.push(Integer.valueOf(action.replace("S","")));
-				System.out.println("移进"+t.toString());
+				s.push(Integer.valueOf(action.replace("S", "")));
+				System.out.println("移进" + t.toString());
 			}
-			else if(action.matches("r\\d+"))//规约
+			else if (action.matches("r\\d+"))//规约
 			{
 				Production p = productions.get(Integer.parseInt(action.replace("r", "")));
 				LinkedList<Symbol> stackTop = new LinkedList<>();
-				for (int count = p.right.size();count>=0;count--)
+				for (int count = p.right.size(); count > 0; count--)
 					stackTop.push(x.pop());
-				if(stackTop.equals(p.right))
+				if (stackTop.equals(p.right))
 				{
-					for (int count = p.right.size();count>=0;count--)
+					for (int count = p.right.size(); count > 0; count--)
 						s.pop();
 					x.push(p.left);
 					Integer newState = grammar.getGoto(s.peek(), (Variable) x.peek());
-					if(newState!=null)
+					if (newState != null)
 					{
 						s.push(newState);
-						System.out.println("规约"+p.toString());
+						System.out.println("规约" + p.toString());
+						i--;
 					}
 					else
 					{
@@ -71,7 +82,7 @@ public class Main
 					return;
 				}
 			}
-			else if(action.equals("acc"))//接受
+			else if (action.equals("acc"))//接受
 				System.out.println("语法分析成功完成！");
 			else//出错
 			{
