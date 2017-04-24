@@ -29,8 +29,7 @@ public class Production
 	@Override
 	public boolean equals(Object obj)
 	{
-		Boolean result = (this == obj) || ((obj instanceof Production)
+		return (this == obj) || ((obj instanceof Production)
 				&& (left.equals(((Production) obj).left)) && (right.equals(((Production) obj).right)));
-		return result;
 	}
 }

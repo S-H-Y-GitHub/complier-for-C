@@ -1,12 +1,11 @@
 package domain;
 public class Symbol
 {
+	public String s;
 	public Symbol() {}
 	public Symbol(String s){
 		this.s = s;
 	}
-	public String s;
-	
 	@Override
 	public String toString()
 	{
@@ -22,7 +21,6 @@ public class Symbol
 	@Override
 	public boolean equals(Object obj)
 	{
-		Boolean result =(this == obj) || ((this.getClass()==obj.getClass()) && (s.equals(((Symbol)obj).s)));
-		return result;
+		return (this == obj) || ((this.getClass() == obj.getClass()) && (s.equals(((Symbol) obj).s)));
 	}
 }

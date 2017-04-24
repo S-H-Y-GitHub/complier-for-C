@@ -20,8 +20,7 @@ public class Variable extends Symbol {
 	@Override
 	public boolean equals(Object obj)
 	{
-		Boolean result = (this == obj) || ((obj instanceof Variable)
+		return (this == obj) || ((obj instanceof Variable)
 				&& s.equals(((Variable)obj).s) && nullable.equals(((Variable)obj).nullable));
-		return result;
 	}
 }

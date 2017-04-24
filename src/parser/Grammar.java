@@ -1,28 +1,27 @@
 package parser;
 
-import domain.*;
+import domain.Production;
+import domain.Symbol;
+import domain.Terminal;
+import domain.Variable;
 import javafx.util.Pair;
 
-import java.io.FileReader;
 import java.util.*;
 public class Grammar
 {
-	public List<Production> productions;
-	public List<Variable> variables;
-	public List<Terminal> terminals;
-	public HashMap<Pair<Variable,Integer>,Integer> go;
-	public HashMap<Pair<Terminal,Integer>,String> action;
-	public Map<Pair<Set<LR1Item>, Symbol>, Integer> transition;
-	public List<Set<LR1Item>> states;
-	public HashMap<Variable, HashSet<Terminal>> first;
+	private List<Production> productions;
+	private HashMap<Pair<Variable, Integer>, Integer> go;
+	private HashMap<Pair<Terminal, Integer>, String> action;
+	//public HashMap<Variable, HashSet<Terminal>> first;
 	
-	public Grammar()
+	Grammar()
 	{
 		productions = new ArrayList<>();
-		variables = new LinkedList<>();
-		terminals = new LinkedList<>();
+		List<Variable> variables = new LinkedList<>();
+		List<Terminal> terminals = new LinkedList<>();
 		go = new HashMap<>();
 		action = new HashMap<>();
+		//一个简单的C语言文法产生式
 		{
 			Variable Sp = new Variable("$S`", false);
 			Variable S = new Variable("$S", false);
@@ -107,11 +106,11 @@ public class Grammar
 			productions.addAll(Arrays.asList(ps,p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12, p13, p14, p15, p16,
 					p17, p18, p19, p20, p21, p22, p23, p24, p25, p26, p27, p28, p29, p30, p31, p32));
 		}
-		DFA dfa = new DFA(productions, variables, terminals);
-		states = dfa.states;
-		transition = dfa.transition;
-		first = dfa.first;
-		for(int i = 0;i<states.size();i++)
+		DFA dfa = new DFA(productions, variables);
+		List<Set<LR1Item>> states = dfa.states;
+		Map<Pair<Set<LR1Item>, Symbol>, Integer> transition = dfa.transition;
+		//first = dfa.first;
+		for (int i = 0; i < states.size(); i++)
 		{
 			Set<LR1Item> state = states.get(i);
 			for (LR1Item item : state)//处理规约
@@ -132,7 +131,7 @@ public class Grammar
 				if(transition.containsKey(transKey))
 				{
 					Pair<Terminal, Integer> actionKey = new Pair<>(terminal,i);
-					action.put(actionKey,"S"+transition.get(transKey));
+					action.put(actionKey, "S" + transition.get(transKey));
 				}
 			}
 			for (Variable variable : variables)//处理goto表
@@ -141,21 +140,21 @@ public class Grammar
 				if(transition.containsKey(transKey))
 				{
 					Pair<Variable, Integer> actionKey = new Pair<>(variable,i);
-					go.put(actionKey,transition.get(transKey));
+					go.put(actionKey, transition.get(transKey));
 				}
 			}
 		}
 	}
-	public List<Production> getProductions()
+	List<Production> getProductions()
 	{
 		return productions;
 	}
 	
-	public String getAction(int state, Terminal input)
+	String getAction(int state, Terminal input)
 	{
 		return action.get(new Pair<>(input,state));
 	}
-	public Integer getGoto(int state, Variable input)
+	Integer getGoto(int state, Variable input)
 	{
 		return go.get(new Pair<>(input,state));
 	}

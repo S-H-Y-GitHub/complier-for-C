@@ -8,20 +8,18 @@ import domain.Variable;
 import javafx.util.Pair;
 
 import java.util.*;
-public class DFA
+class DFA
 {
 	List<Set<LR1Item>> states;
 	Map<Pair<Set<LR1Item>, Symbol>, Integer> transition;
-	List<Production> productions;
-	public HashMap<Variable, HashSet<Terminal>> first;
-	List<Variable> variables;
-	List<Terminal> terminals;
+	private List<Production> productions;
+	private HashMap<Variable, HashSet<Terminal>> first;
+	private List<Variable> variables;
 	
-	public DFA(List<Production> productions, List<Variable> variables, List<Terminal> terminals)
+	DFA(List<Production> productions, List<Variable> variables)
 	{
 		this.productions = productions;
 		this.variables = variables;
-		this.terminals = terminals;
 		transition = new HashMap<>();
 		
 		states = new LinkedList<>();
@@ -36,7 +34,7 @@ public class DFA
 		states.add(state);
 		buildDFA(state);
 	}
-	public void buildDFA(Set<LR1Item> state)
+	private void buildDFA(Set<LR1Item> state)
 	{
 		//找出这个节点的子节点
 		for (LR1Item item : state)
@@ -103,7 +101,7 @@ public class DFA
 		}
 	}
 	
-	public void closure(Set<LR1Item> state)
+	private void closure(Set<LR1Item> state)
 	{
 		if (state.size() < 1)
 			throw new IllegalArgumentException("做为函数closure参数传入的必须是一个已经恰当初始化的状态");
@@ -171,7 +169,7 @@ public class DFA
 	}
 	
 	@NotNull
-	public HashSet<Terminal> getFirst(Symbol symbol)
+	private HashSet<Terminal> getFirst(Symbol symbol)
 	{
 		if (symbol instanceof Terminal)
 		{
@@ -181,7 +179,7 @@ public class DFA
 		}
 		else if (first != null)
 		{
-			return first.get((Variable) symbol);
+			return first.get(symbol);
 		}
 		else
 		{
@@ -202,10 +200,10 @@ public class DFA
 							break;
 						}
 						else if ((s instanceof Variable) && ((Variable) s).nullable)
-							changed |= first.get(p.left).addAll(first.get((Variable) s));
+							changed |= first.get(p.left).addAll(first.get(s));
 						else if ((s instanceof Variable) && !((Variable) s).nullable)
 						{
-							changed |= first.get(p.left).addAll(first.get((Variable) s));
+							changed |= first.get(p.left).addAll(first.get(s));
 							break;
 						}
 					}

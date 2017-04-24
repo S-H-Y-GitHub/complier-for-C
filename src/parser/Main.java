@@ -7,7 +7,10 @@ import domain.Variable;
 import javafx.util.Pair;
 import lexicalAnalyzer.LexicalAnalyzer;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Stack;
 public class Main
 {
 	public static void main(String[] args) throws Exception
@@ -27,12 +30,14 @@ public class Main
 		Stack<Integer> s = new Stack<>(); //状态栈
 		Stack<Symbol> x = new Stack<>(); //符号栈，用空格做为结束字符
 		Grammar grammar = new Grammar();
+		/*仅用于调试
 		HashMap<Pair<Variable,Integer>,Integer> go = grammar.go;
 		HashMap<Pair<Terminal,Integer>,String> action1 = grammar.action;
 		Map<Pair<Set<LR1Item>, Symbol>, Integer> transition = grammar.transition;
 		List<Set<LR1Item>> states = grammar.states;
 		HashMap<Variable, HashSet<Terminal>> first = grammar.first;
 		Arrays.asList(go,action1,transition,states,first);
+		*/
 		s.push(0);
 		x.push(new Terminal("end"));
 		List<Production> productions = grammar.getProductions();
@@ -50,7 +55,7 @@ public class Main
 			{
 				x.push(t.getKey());
 				s.push(Integer.valueOf(action.replace("S", "")));
-				System.out.println("移进" + t.toString());
+				System.out.println("移进\t" + t.toString());
 			}
 			else if (action.matches("r\\d+"))//规约
 			{
@@ -69,7 +74,7 @@ public class Main
 					if (newState != null)
 					{
 						s.push(newState);
-						System.out.println("规约" + p.toString());
+						System.out.println("规约\t" + p.toString());
 						i--;
 					}
 					else

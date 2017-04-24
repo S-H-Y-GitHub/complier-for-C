@@ -10,9 +10,8 @@ public class Terminal extends Symbol {
 	@Override
 	public boolean equals(Object obj)
 	{
-		Boolean result = (this == obj) || ((obj instanceof Terminal)
+		return (this == obj) || ((obj instanceof Terminal)
 				&& s.equals(((Terminal)obj).s));
-		return result;
 	}
 	@Override
 	public int hashCode()
