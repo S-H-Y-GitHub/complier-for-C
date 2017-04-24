@@ -99,7 +99,10 @@ public class DFA
 					if (p.left.equals(symbol))//找到一个需要加入状态中的产生式
 					{
 						LR1Item newItem = new LR1Item();
-						newItem.dotPosition = 0;
+						if(p.right.size()==1&&p.right.get(0).s.equals(""))//若为生成空
+							newItem.dotPosition = 1;
+						else
+							newItem.dotPosition = 0;
 						newItem.production = p;
 						if (item.dotPosition == item.production.right.size() - 1)
 							newItem.lookaheads = item.lookaheads;
