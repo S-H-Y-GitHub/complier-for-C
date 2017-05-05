@@ -1,7 +1,7 @@
 int main()
 {
 	char a;
-	int[13] b;
+	int b[13];
 	int i;
 	b = 0;
 	for(i = 0;i < 13; i=i+1)

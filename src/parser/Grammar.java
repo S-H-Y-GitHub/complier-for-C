@@ -80,7 +80,7 @@ public class Grammar
 			Production p7 = new Production(B, ASSI, sc);
 			Production p8 = new Production(ASSI, id, is, EXPS);
 			Production p9 = new Production(DECL, TYPE, id);
-			Production p10 = new Production(DECL, TYPE, lm, num, rm, id);
+			Production p10 = new Production(DECL, TYPE, id, lm, num, rm);
 			Production p11 = new Production(TYPE, in);
 			Production p12 = new Production(TYPE, cha);
 			Production p13 = new Production(FOR, fo, ls, ASSI, sc, BOOL, sc, ASSI, rs, lb, A, rb);

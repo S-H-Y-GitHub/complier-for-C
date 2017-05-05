@@ -30,7 +30,13 @@ public class Main
 		Stack<Integer> s = new Stack<>(); //状态栈
 		Stack<Symbol> x = new Stack<>(); //符号栈
 		Grammar grammar = new Grammar();
-		/*仅用于调试
+		s.push(0);
+		x.push(new Terminal("end"));
+		List<Production> productions = grammar.getProductions();
+		Translation translation = new Translation(laResult);
+		String action;
+		/*
+		仅用于调试
 		HashMap<Pair<Variable,Integer>,Integer> go = grammar.go;
 		HashMap<Pair<Terminal,Integer>,String> action1 = grammar.action;
 		Map<Pair<Set<LR1Item>, Symbol>, Integer> transition = grammar.transition;
@@ -38,11 +44,6 @@ public class Main
 		HashMap<Variable, HashSet<Terminal>> first = grammar.first;
 		Arrays.asList(go,action1,transition,states,first);
 		*/
-		s.push(0);
-		x.push(new Terminal("end"));
-		List<Production> productions = grammar.getProductions();
-		Translation translation = new Translation(laResult);
-		String action;
 		for (int i = 0; i < laResult.size(); i++)
 		{
 			Pair<Terminal, String> t = laResult.get(i);
@@ -77,7 +78,17 @@ public class Main
 						s.push(newState);
 						System.out.println("规约\t" + p.toString());
 						i--;
-						translation.getClass().getMethod(p.left.s, Integer.class).invoke(translation, i);
+						//调用语义分析挂钩程序
+						try
+						{
+							translation.getClass().getMethod(p.left.s, Integer.class).invoke(translation, i);
+						}
+						catch (NoSuchMethodException ignored){}
+						catch (Exception e)
+						{
+							System.err.println(e.getMessage());
+							return;
+						}
 					}
 					else
 					{

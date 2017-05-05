@@ -40,13 +40,11 @@ public class Grammar
 			Variable IF = new Variable("$IF", false);
 			Variable ELSE = new Variable("$ELSE", true);
 			Variable EXPS = new Variable("$EXPS", false);
-			Variable D = new Variable("$D", true);
-			Variable C = new Variable("$C", false);
 			Variable OP = new Variable("$OP", false);
 			Variable BOOL = new Variable("$BOOL", false);
 			Variable JUG = new Variable("$JUG", false);
 			variables.addAll(Arrays.asList(Sp, S, A, B, M1, M2, M3, M4, M5, M6, ASSI, DECL, TYPE, FOR, IF, ELSE,
-					EXPS, D, C, OP, BOOL, JUG));
+					EXPS, OP, BOOL, JUG));
 			Terminal id = new Terminal("标识符");
 			Terminal ret = new Terminal("RETURN");
 			Terminal num = new Terminal("数字");
@@ -86,21 +84,19 @@ public class Grammar
 			Production p6 = new Production(B, DECL, sc);
 			Production p7 = new Production(B, ASSI, sc);
 			Production p8 = new Production(ASSI, id, is, EXPS);
-			Production p9 = new Production(DECL, TYPE, id);
-			Production p10 = new Production(DECL, TYPE, lm, num, rm, id);
+			Production p9 = new Production(DECL, TYPE, id, M3);
+			Production p10 = new Production(DECL, TYPE, id, lm, num, rm, M4);
 			Production p11 = new Production(TYPE, in);
 			Production p12 = new Production(TYPE, cha);
 			Production p13 = new Production(FOR, fo, ls, ASSI, sc, BOOL, sc, ASSI, rs, lb, A, rb);
 			Production p14 = new Production(IF, f, ls, BOOL, rs, lb, A, rb, ELSE);
 			Production p15 = new Production(ELSE, els, lb, A, rb);
 			Production p16 = new Production(ELSE, nul);
-			Production p17 = new Production(EXPS, C, D);
-			Production p18 = new Production(D, OP, C, D);
-			Production p19 = new Production(D, nul);
-			Production p20 = new Production(C, id);
-			Production p21 = new Production(C, num);
-			Production p22 = new Production(C, str);
-			Production p23 = new Production(C, chr);
+			Production p17 = new Production(EXPS, EXPS,OP,EXPS,M5);
+			Production p20 = new Production(EXPS, id,M6);
+			Production p21 = new Production(EXPS, num,M6);
+			Production p22 = new Production(EXPS, str,M6);
+			Production p23 = new Production(EXPS, chr,M6);
 			Production p24 = new Production(OP, add);
 			Production p25 = new Production(OP, mius);
 			Production p26 = new Production(OP, mult);
@@ -118,7 +114,7 @@ public class Grammar
 			Production p38 = new Production(M6, nul);
 			
 			productions.addAll(Arrays.asList(ps, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
-					p11, p12, p13, p14, p15, p16, p17, p18, p19, p20,
+					p11, p12, p13, p14, p15, p16, p17, p20,
 					p21, p22, p23, p24, p25, p26, p27, p28, p29, p30,
 					p31, p32, p33, p34, p35, p36, p37, p38));
 		}
