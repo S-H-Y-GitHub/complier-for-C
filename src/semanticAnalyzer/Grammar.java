@@ -33,6 +33,15 @@ public class Grammar
 			Variable M4 = new Variable("M4", true);
 			Variable M5 = new Variable("M5", true);
 			Variable M6 = new Variable("M6", true);
+			Variable M7 = new Variable("M7", true);
+			Variable M8 = new Variable("M8", true);
+			Variable M9 = new Variable("M9", true);
+			Variable M10 = new Variable("M10", true);
+			Variable M11 = new Variable("M11", true);
+			Variable M12 = new Variable("M12", true);
+			Variable M13 = new Variable("M13", true);
+			Variable M14 = new Variable("M14", true);
+			Variable M15 = new Variable("M15", true);
 			Variable ASSI = new Variable("$ASSI", false);
 			Variable DECL = new Variable("$DECL", false);
 			Variable TYPE = new Variable("$TYPE", false);
@@ -43,8 +52,8 @@ public class Grammar
 			Variable OP = new Variable("$OP", false);
 			Variable BOOL = new Variable("$BOOL", false);
 			Variable JUG = new Variable("$JUG", false);
-			variables.addAll(Arrays.asList(Sp, S, A, B, M1, M2, M3, M4, M5, M6, ASSI, DECL, TYPE, FOR, IF, ELSE,
-					EXPS, OP, BOOL, JUG));
+			variables.addAll(Arrays.asList(Sp, S, A, B, M1, M2, M3, M4, M5, M6,M7,M8,M9,M10,M11,M12,
+					M13,M14,M15,ASSI, DECL, TYPE, FOR, IF, ELSE, EXPS, OP, BOOL, JUG));
 			Terminal id = new Terminal("标识符");
 			Terminal ret = new Terminal("RETURN");
 			Terminal num = new Terminal("数字");
@@ -89,9 +98,9 @@ public class Grammar
 			Production p11 = new Production(TYPE, in);
 			Production p12 = new Production(TYPE, cha);
 			Production p13 = new Production(FOR, fo, ls, ASSI, sc, BOOL, sc, ASSI, rs, lb, A, rb);
-			Production p14 = new Production(IF, f, ls, BOOL, rs, lb, A, rb, ELSE);
-			Production p15 = new Production(ELSE, els, lb, A, rb);
-			Production p16 = new Production(ELSE, nul);
+			Production p14 = new Production(IF, f, ls, BOOL, rs, lb, M7,A, rb, M8, ELSE);
+			Production p15 = new Production(ELSE, els, lb,M9, A, rb,M10);
+			Production p16 = new Production(ELSE, M11);
 			Production p17 = new Production(EXPS, EXPS,OP,EXPS,M5);
 			Production p20 = new Production(EXPS, id,M6);
 			Production p21 = new Production(EXPS, num,M6);
@@ -112,11 +121,23 @@ public class Grammar
 			Production p36 = new Production(M4, nul);
 			Production p37 = new Production(M5, nul);
 			Production p38 = new Production(M6, nul);
+			Production p39 = new Production(M7, nul);
+			Production p40 = new Production(M8, nul);
+			Production p41 = new Production(M9, nul);
+			Production p42 = new Production(M10, nul);
+			Production p43 = new Production(M11, nul);
+			Production p44 = new Production(M12, nul);
+			Production p45 = new Production(M13, nul);
+			Production p46 = new Production(M14, nul);
+			Production p47 = new Production(M15, nul);
+			//Production p38 = new Production(M6, nul);
+			//Production p38 = new Production(M6, nul);
 			
 			productions.addAll(Arrays.asList(ps, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9, p10,
 					p11, p12, p13, p14, p15, p16, p17, p20,
 					p21, p22, p23, p24, p25, p26, p27, p28, p29, p30,
-					p31, p32, p33, p34, p35, p36, p37, p38));
+					p31, p32, p33, p34, p35, p36, p37, p38,p39,p40,p41,
+					p42,p43,p44,p45,p46,p47));
 		}
 		DFA dfa = new DFA(productions, variables);
 		List<Set<LR1Item>> states = dfa.states;
