@@ -7,6 +7,7 @@ import domain.Variable;
 import javafx.util.Pair;
 import lexicalAnalyzer.LexicalAnalyzer;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -86,7 +87,7 @@ public class Main
 						catch (NoSuchMethodException ignored){}
 						catch (Exception e)
 						{
-							System.err.println(e.getMessage());
+							System.err.println(((InvocationTargetException) e).getTargetException().getMessage());
 							return;
 						}
 					}
@@ -106,7 +107,7 @@ public class Main
 			{
 				System.out.println("语法分析成功完成！");
 				System.out.println("生成的三地址码：");
-				System.out.println(translation.interCode);
+				translation.printCode();
 				System.out.println("使用的符号表：");
 				System.out.println(translation.symbols);
 			}
