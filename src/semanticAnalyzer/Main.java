@@ -6,6 +6,7 @@ import model.Production;
 import model.Symbol;
 import model.Terminal;
 import model.Variable;
+import parser.Grammar;
 
 import java.lang.reflect.InvocationTargetException;
 import java.util.LinkedList;

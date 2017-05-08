@@ -4,7 +4,6 @@ import model.Production;
 import model.Terminal;
 
 import java.util.HashSet;
-@Deprecated
 public class LR1Item
 {
 	public Production production;

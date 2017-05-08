@@ -8,7 +8,6 @@ import model.Terminal;
 import model.Variable;
 
 import java.util.*;
-@Deprecated
 class DFA
 {
 	List<Set<LR1Item>> states;
@@ -82,7 +81,7 @@ class DFA
 								break;
 							}
 						}
-						if(flag)
+						if (flag)
 						{
 							checked = true;
 							transition.put(new Pair<>(state, change), states.indexOf(finishedState));
@@ -127,7 +126,7 @@ class DFA
 							newItem.dotPosition = 0;
 						newItem.production = p;
 						newItem.lookaheads = new HashSet<>();
-						for(int j = item.dotPosition + 1; j <= item.production.right.size(); j++)
+						for (int j = item.dotPosition + 1; j <= item.production.right.size(); j++)
 						{
 							if (j == item.production.right.size())
 							{
@@ -137,9 +136,9 @@ class DFA
 							else
 							{
 								Symbol smb = item.production.right.get(j);
-								if(smb instanceof Variable && ((Variable) smb).nullable)
+								if (smb instanceof Variable && ((Variable) smb).nullable)
 									newItem.lookaheads.addAll(getFirst(smb));
-								else if(smb.s.equals(""));
+								else if (smb.s.equals("")) ;
 								else
 								{
 									newItem.lookaheads.addAll(getFirst(smb));
