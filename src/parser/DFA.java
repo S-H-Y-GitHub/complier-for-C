@@ -1,13 +1,14 @@
 package parser;
 
 import com.sun.istack.internal.NotNull;
-import domain.Production;
-import domain.Symbol;
-import domain.Terminal;
-import domain.Variable;
 import javafx.util.Pair;
+import model.Production;
+import model.Symbol;
+import model.Terminal;
+import model.Variable;
 
 import java.util.*;
+@Deprecated
 class DFA
 {
 	List<Set<LR1Item>> states;

@@ -1,16 +1,17 @@
 package parser;
 
-import domain.Production;
-import domain.Symbol;
-import domain.Terminal;
-import domain.Variable;
 import javafx.util.Pair;
 import lexicalAnalyzer.LexicalAnalyzer;
+import model.Production;
+import model.Symbol;
+import model.Terminal;
+import model.Variable;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
+@Deprecated
 public class Main
 {
 	public static void main(String[] args) throws Exception
@@ -42,7 +43,7 @@ public class Main
 		x.push(new Terminal("end"));
 		List<Production> productions = grammar.getProductions();
 		String action;
-		for (int i = 0; i<laResult.size();i++)
+		for (int i = 0; i<laResult.size(); i++)
 		{
 			Pair<Terminal, String> t = laResult.get(i);
 			action = grammar.getAction(s.peek(), t.getKey());

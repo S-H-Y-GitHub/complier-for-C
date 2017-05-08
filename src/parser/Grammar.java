@@ -1,12 +1,13 @@
 package parser;
 
-import domain.Production;
-import domain.Symbol;
-import domain.Terminal;
-import domain.Variable;
 import javafx.util.Pair;
+import model.Production;
+import model.Symbol;
+import model.Terminal;
+import model.Variable;
 
 import java.util.*;
+@Deprecated
 public class Grammar
 {
 	private List<Production> productions;
@@ -123,7 +124,7 @@ public class Grammar
 						else
 							action.put(new Pair<>(terminal,i),"acc");
 					}
-					
+				
 			}
 			for(Terminal terminal : terminals)//处理移进
 			{

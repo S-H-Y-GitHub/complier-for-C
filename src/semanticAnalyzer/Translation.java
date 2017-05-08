@@ -1,7 +1,7 @@
 package semanticAnalyzer;
 
-import domain.Terminal;
 import javafx.util.Pair;
+import model.Terminal;
 
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -167,9 +167,15 @@ public class Translation
 	{
 		for_l3_bp.push(interCode.size());
 	}
-	public void M13(Integer i) throws Exception
+	public void M12(Integer i) throws Exception
 	{
-	
+		if (laResult.get(i - 3).getKey().s.equals("标识符") && !symbols.containsKey(laResult.get(i - 3).getValue()))
+			throw new Exception("引用了未定义的变量");
+		Integer index = Integer.valueOf(laResult.get(i - 1).getValue());
+		if (index > Integer.valueOf(symbols.get(laResult.get(i - 3).getValue()).replaceAll("\\D", "")))
+			throw new Exception("数组访问越界");
+		stack.push(new Pair<>(new Terminal("标识符"),
+				("[" + laResult.get(i - 3).getValue() + " + " + index + "]")));
 	}
 	public void M14(Integer i) throws Exception
 	{

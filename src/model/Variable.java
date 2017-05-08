@@ -1,4 +1,4 @@
-package domain;
+package model;
 public class Variable extends Symbol {
 	public Boolean nullable;
 	

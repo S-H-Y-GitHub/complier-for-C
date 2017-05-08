@@ -1,8 +1,8 @@
 package lexicalAnalyzer;
 
 
-import domain.Terminal;
 import javafx.util.Pair;
+import model.Terminal;
 
 import java.io.BufferedReader;
 import java.io.FileReader;

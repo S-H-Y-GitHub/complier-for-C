@@ -3,7 +3,7 @@ int main()
 	char a;
 	int b[13];
 	int i;
-	b = 0;
+	b[3] = 0;
 	for(i = 0;i < 13; i=i+1)
 	{
         i = a + 1;

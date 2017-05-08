@@ -1,7 +1,7 @@
 package semanticAnalyzer;
 
-import domain.Production;
-import domain.Terminal;
+import model.Production;
+import model.Terminal;
 
 import java.util.HashSet;
 public class LR1Item

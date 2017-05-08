@@ -1,5 +1,5 @@
-import domain.Production;
-import domain.Terminal;
+import model.Production;
+import model.Terminal;
 import parser.LR1Item;
 
 import java.util.HashSet;
