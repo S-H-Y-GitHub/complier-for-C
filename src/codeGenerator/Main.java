@@ -1,20 +1,14 @@
 package codeGenerator;
 
-import javafx.util.Pair;
-import lexicalAnalyzer.LexicalAnalyzer;
-import model.Production;
-import model.Symbol;
-import model.Terminal;
-import model.Variable;
-import parser.Grammar;
+import semanticAnalyzer.SemanticAnalyzer;
 
-import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Scanner;
-import java.util.Stack;
 public class Main
 {
+	static private HashMap<String, String> symbols;
+	
 	public static void main(String[] args) throws Exception
 	{
 		String filename = "";
@@ -27,96 +21,125 @@ public class Main
 			if (scan.hasNextLine())
 				filename = scan.next();
 		}
-		LexicalAnalyzer l = new LexicalAnalyzer();
-		List<Pair<Terminal, String>> laResult = l.getSymbols(filename); //词法分析器的结果
-		Stack<Integer> s = new Stack<>(); //状态栈
-		Stack<Symbol> x = new Stack<>(); //符号栈
-		Grammar grammar = new Grammar();
-		s.push(0);
-		x.push(new Terminal("end"));
-		List<Production> productions = grammar.getProductions();
-		Translation translation = new Translation(laResult);
-		String action;
-		/*
-		仅用于调试
-		HashMap<Pair<Variable,Integer>,Integer> go = grammar.go;
-		HashMap<Pair<Terminal,Integer>,String> action1 = grammar.action;
-		Map<Pair<Set<LR1Item>, Symbol>, Integer> transition = grammar.transition;
-		List<Set<LR1Item>> states = grammar.states;
-		HashMap<Variable, HashSet<Terminal>> first = grammar.first;
-		Arrays.asList(go,action1,transition,states,first);
-		*/
-		for (int i = 0; i < laResult.size(); i++)
+		SemanticAnalyzer s = new SemanticAnalyzer(filename);
+		LinkedList<String> interCode = s.getInterCode();
+		symbols = s.getSymbols();
+		LinkedList<String> result = new LinkedList<>();
+		if (interCode == null)
+			return;
+		for (int i = 0; i < interCode.size(); i++)
 		{
-			Pair<Terminal, String> t = laResult.get(i);
-			action = grammar.getAction(s.peek(), t.getKey());
-			if (action == null)
+			String code = interCode.get(i);
+			if (code.matches("call.+"))
 			{
-				System.err.println("不是规范的C语言程序或文法定义有误");
-				return;
+				String asmCode = code.replace("call ", "invoke\t");
+				result.add(i + ":\t\t" + asmCode);
 			}
-			else if (action.matches("S\\d+"))//移进
+			else if (code.matches("return.+"))
 			{
-				x.push(t.getKey());
-				s.push(Integer.valueOf(action.replace("S", "")));
-				System.out.println("移进\t" + t.toString());
+				String retValue = getAsmType(code.replace("return", "").trim());
+				if (retValue.length() > 0)
+					result.add(i + ":\t\tmov\t\teax," + retValue);
+				result.add("\t\tret");
 			}
-			else if (action.matches("r\\d+"))//规约
+			else if (code.matches("\\[.+\\].+:=.+"))
 			{
-				Production p = productions.get(Integer.parseInt(action.replace("r", "")));
-				LinkedList<Symbol> stackTop = new LinkedList<>();
-				int count = p.right.get(0).s.equals("") ? 0 : p.right.size();
-				for (; count > 0; count--)
-					stackTop.push(x.pop());
-				if (stackTop.equals(p.right) || (stackTop.size() == 0 && p.right.get(0).s.equals("")))
+				String left = code.split(":=")[0];
+				String right = code.split(":=")[1].trim();
+				left = left.replace("[", "").replace("]", "");
+				String var = left.split("\\+")[0].trim();
+				String offset = left.split("\\+")[1].trim();
+				String type = symbols.get(var);
+				right = getAsmType(right);
+				if (type.contains("int"))
 				{
-					count = p.right.get(0).s.equals("") ? 0 : p.right.size();
-					for (; count > 0; count--)
-						s.pop();
-					x.push(p.left);
-					Integer newState = grammar.getGoto(s.peek(), (Variable) x.peek());
-					if (newState != null)
-					{
-						s.push(newState);
-						System.out.println("规约\t" + p.toString());
-						i--;
-						//调用语义分析挂钩程序
-						try
-						{
-							translation.getClass().getMethod(p.left.s, Integer.class).invoke(translation, i);
-						}
-						catch (NoSuchMethodException ignored) {}
-						catch (Exception e)
-						{
-							System.err.println(((InvocationTargetException) e).getTargetException().getMessage());
-							return;
-						}
-					}
-					else
-					{
-						System.err.println("不是规范的C语言程序或文法定义有误");
-						return;
-					}
+					result.add(i + ":\t\tmov\t\teax,4");
+					result.add("\t\timul\tecx,eax," + offset);
+					result.add("\t\tmov\t\tdword ptr " + var + "[ecx]," + right);
 				}
-				else
+				else if (type.contains("char"))
 				{
-					System.err.println("不是规范的C语言程序或文法定义有误");
-					return;
+					result.add(i + ":\t\tmov\teax,1");
+					result.add("\t\timul\tecx,eax," + offset);
+					result.add("\t\tmov\t\tbyte ptr " + var + "[ecx]," + right);
 				}
 			}
-			else if (action.equals("acc"))//接受
+			else if (code.matches("\\w+ := .+ [+\\-*/] .+"))
 			{
-				System.out.println("语法分析成功完成！");
-				System.out.println("生成的汇编代码：");
-				translation.printCode();
-				System.out.println("使用的符号表：");
-				System.out.println(translation.symbols);
+				String left = getAsmType(code.split(" := ")[0]);
+				String right = code.split(" := ")[1];
+				String p1 = getAsmType(right.split(" ")[0]);
+				String op = right.split(" ")[1];
+				String p2 = getAsmType(right.split(" ")[2]);
+				result.add(i + ":\t\tmov\t\teax," + p1);
+				switch (op)
+				{
+					case "+":
+						result.add("\t\tadd\t\teax," + p2);
+						break;
+					case "-":
+						result.add("\t\tsub\t\teax," + p2);
+						break;
+					case "*":
+						result.add("\t\timul\teax," + p2);
+						break;
+					case "/":
+						result.add("\t\tidiv\teax," + p2);
+				}
+				result.add("\t\tmov\t\t" + left + ",eax");
 			}
-			else//出错
+			else if (code.matches(".+ := .+"))
 			{
-				System.err.println("unknown error");
-				return;
+				String left = code.split(":=")[0].trim();
+				String right = code.split(":=")[1].trim();
+				String type = symbols.get(left);
+				if (type.contains("int"))
+					result.add(i + ":\t\tmov\t\tdword ptr [" + left + "]," + right);
+				else if (type.contains("char"))
+					result.add(i + ":\t\tmov\t\tbyte ptr [" + left + "]," + right);
+			}
+			else if (code.matches("goto \\d+"))
+			{
+				String num = code.replace("goto ", "");
+				result.add(i + ":\t\tjmp\t\t" + num);
+			}
+			else if (code.matches("if \\w+ goto \\d+"))
+			{
+				//处理布尔产生式
+				String boolcode = interCode.get(i - 1);
+				String right = boolcode.split(" := ")[1];
+				String p1 = getAsmType(right.split(" ")[0]);
+				String op = right.split(" ")[1];
+				String p2 = getAsmType(right.split(" ")[2]);
+				result.add((i - 1) + ":\t\tcmp\t\t" + p1 + "," + p2);
+				//处理跳转语句
+				String target = code.split(" ")[3];
+				switch (op)
+				{
+					case "<":
+						result.add(i + ":\t\tjl\t\t" + target);
+						break;
+					case ">":
+						result.add(i + ":\t\tjg\t\t" + target);
+						break;
+					case "==":
+						result.add(i + ":\t\tje\t\t" + target);
+						break;
+					case "!=":
+						result.add(i + ":\t\tjne\t\t" + target);
+				}
 			}
 		}
+		for (String code : result)
+			System.out.println(code);
+	}
+	private static String getAsmType(String key)
+	{
+		String type = symbols.get(key);
+		if (type != null && type.contains("int"))
+			key = "dword ptr [" + key + "]";
+		else if (type != null && type.contains("char"))
+			key = "byte ptr [" + key + "]";
+		return key;
 	}
 }

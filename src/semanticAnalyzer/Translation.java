@@ -10,14 +10,6 @@ import java.util.Stack;
 public class Translation
 {
 	/**
-	 * 最终的三地址码序列
-	 */
-	public LinkedList<String> interCode;
-	/**
-	 * 符号表
-	 */
-	public HashMap<String, String> symbols;
-	/**
 	 * 表达式的规约栈
 	 */
 	public Stack<Pair<Terminal, String>> stack;
@@ -32,11 +24,13 @@ public class Translation
 	public Stack<Integer> for_l2_bp;
 	public Stack<Integer> for_l3_bp;
 	public Stack<Integer> for_l4_bp;
+	private LinkedList<String> interCode;
+	private HashMap<String, String> symbols;
 	private List<Pair<Terminal, String>> laResult;
 	public Translation(List<Pair<Terminal, String>> laResult)
 	{
-		interCode = new LinkedList<>();
-		symbols = new HashMap<>();
+		setInterCode(new LinkedList<>());
+		setSymbols(new HashMap<>());
 		stack = new Stack<>();
 		if_bp = new Stack<>();
 		this.laResult = laResult;
@@ -49,24 +43,24 @@ public class Translation
 	public void M1(Integer i)
 	{
 		String value = laResult.get(i - 3).getValue();
-		interCode.add("call " + value);
+		getInterCode().add("call " + value);
 	}
 	public void M2(Integer i)
 	{
 		String value = stack.pop().getValue();
-		interCode.add("return " + value);
+		getInterCode().add("return " + value);
 	}
 	public void M3(Integer i) throws Exception
 	{
-		if (symbols.containsKey(laResult.get(i).getValue()))
+		if (getSymbols().containsKey(laResult.get(i).getValue()))
 			throw new Exception("变量" + laResult.get(i).getValue() + "已被声明");
-		symbols.put(laResult.get(i).getValue(), laResult.get(i - 1).getValue());
+		getSymbols().put(laResult.get(i).getValue(), laResult.get(i - 1).getValue());
 	}
 	public void M4(Integer i) throws Exception
 	{
-		if (symbols.containsKey(laResult.get(i - 3).getValue()))
+		if (getSymbols().containsKey(laResult.get(i - 3).getValue()))
 			throw new Exception("变量" + laResult.get(i - 3).getValue() + "已被声明");
-		symbols.put(laResult.get(i - 3).getValue(), laResult.get(i - 4).getValue()
+		getSymbols().put(laResult.get(i - 3).getValue(), laResult.get(i - 4).getValue()
 				+ "[" + laResult.get(i - 1).getValue() + "]");
 	}
 	public void M5(Integer i) throws Exception
@@ -76,19 +70,19 @@ public class Translation
 		Pair<Terminal, String> p2 = stack.pop();
 		String p1type;
 		if (p1.getKey().s.equals("标识符"))
-			p1type = symbols.get(p1.getValue());
+			p1type = getSymbols().get(p1.getValue());
 		else if (p1.getKey().s.equals("数字"))
 			p1type = "int";
 		else
 			p1type = "char";
-		String temp = "_v" + symbols.size();
-		symbols.put(temp, p1type);
+		String temp = "_v" + getSymbols().size();
+		getSymbols().put(temp, p1type);
 		stack.push(new Pair<>(new Terminal("标识符"), temp));
-		interCode.add(temp + " := " + p2.getValue() + " " + op.getValue() + " " + p1.getValue());
+		getInterCode().add(temp + " := " + p2.getValue() + " " + op.getValue() + " " + p1.getValue());
 	}
 	public void M6(Integer i) throws Exception
 	{
-		if (laResult.get(i).getKey().s.equals("标识符") && !symbols.containsKey(laResult.get(i).getValue()))
+		if (laResult.get(i).getKey().s.equals("标识符") && !getSymbols().containsKey(laResult.get(i).getValue()))
 			throw new Exception("引用了未定义的变量");
 		stack.push(laResult.get(i));
 	}
@@ -105,74 +99,74 @@ public class Translation
 		Pair<Terminal, String> p1 = stack.pop();
 		Pair<Terminal, String> op = stack.pop();
 		Pair<Terminal, String> p2 = stack.pop();
-		String temp = "_b" + symbols.size();
-		symbols.put(temp, "bool");
+		String temp = "_b" + getSymbols().size();
+		getSymbols().put(temp, "bool");
 		stack.push(new Pair<>(new Terminal("标识符"), temp));
-		interCode.add(temp + " := " + p2.getValue() + " " + op.getValue() + " " + p1.getValue());
+		getInterCode().add(temp + " := " + p2.getValue() + " " + op.getValue() + " " + p1.getValue());
 	}
 	public void M7(Integer i) throws Exception
 	{
 		String bool = stack.pop().getValue();
-		interCode.add("if " + bool + " goto " + (interCode.size() + 2));
-		interCode.add("goto ");
-		if_bp.push(interCode.size() - 1);
+		getInterCode().add("if " + bool + " goto " + (getInterCode().size() + 2));
+		getInterCode().add("goto ");
+		if_bp.push(getInterCode().size() - 1);
 	}
 	public void M8(Integer i) throws Exception
 	{
-		interCode.add("goto ");
+		getInterCode().add("goto ");
 		int index = if_bp.pop();
-		String s = interCode.get(index);
-		s = s + interCode.size();
-		interCode.set(index, s);
-		if_bp.push(interCode.size() - 1);
+		String s = getInterCode().get(index);
+		s = s + getInterCode().size();
+		getInterCode().set(index, s);
+		if_bp.push(getInterCode().size() - 1);
 	}
 	public void $ELSE(Integer i) throws Exception
 	{
 		int index = if_bp.pop();
-		String s = interCode.get(index);
-		s = s + interCode.size();
-		interCode.set(index, s);
+		String s = getInterCode().get(index);
+		s = s + getInterCode().size();
+		getInterCode().set(index, s);
 	}
 	public void $ASSI(Integer i) throws Exception
 	{
 		String right = stack.pop().getValue();
 		String left = stack.pop().getValue();
-		interCode.add(left + " := " + right);
+		getInterCode().add(left + " := " + right);
 	}
 	public void M9(Integer i) throws Exception
 	{
-		interCode.add("if " + stack.pop().getValue() + " goto ");
-		for_l1_bp.push(interCode.size() - 1);
-		interCode.add("goto ");
-		for_l2_bp.push(interCode.size() - 1);
-		for_l4_bp.push(interCode.size());
+		getInterCode().add("if " + stack.pop().getValue() + " goto ");
+		for_l1_bp.push(getInterCode().size() - 1);
+		getInterCode().add("goto ");
+		for_l2_bp.push(getInterCode().size() - 1);
+		for_l4_bp.push(getInterCode().size());
 	}
 	public void M10(Integer i) throws Exception
 	{
-		interCode.add("goto " + for_l3_bp.pop());
+		getInterCode().add("goto " + for_l3_bp.pop());
 		int todo = for_l1_bp.pop();
-		String s = interCode.get(todo);
-		s = s + interCode.size();
-		interCode.set(todo, s);
+		String s = getInterCode().get(todo);
+		s = s + getInterCode().size();
+		getInterCode().set(todo, s);
 	}
 	public void $FOR(Integer i) throws Exception
 	{
-		interCode.add("goto " + for_l4_bp.pop());
+		getInterCode().add("goto " + for_l4_bp.pop());
 		int todo = for_l2_bp.pop();
-		String s = interCode.get(todo);
-		s = s + interCode.size();
-		interCode.set(todo, s);
+		String s = getInterCode().get(todo);
+		s = s + getInterCode().size();
+		getInterCode().set(todo, s);
 	}
 	public void M11(Integer i) throws Exception
 	{
-		for_l3_bp.push(interCode.size());
+		for_l3_bp.push(getInterCode().size());
 	}
 	public void M12(Integer i) throws Exception
 	{
-		if (laResult.get(i - 3).getKey().s.equals("标识符") && !symbols.containsKey(laResult.get(i - 3).getValue()))
+		if (laResult.get(i - 3).getKey().s.equals("标识符") && !getSymbols().containsKey(laResult.get(i - 3).getValue()))
 			throw new Exception("引用了未定义的变量");
 		Integer index = Integer.valueOf(laResult.get(i - 1).getValue());
-		if (index > Integer.valueOf(symbols.get(laResult.get(i - 3).getValue()).replaceAll("\\D", "")))
+		if (index > Integer.valueOf(getSymbols().get(laResult.get(i - 3).getValue()).replaceAll("\\D", "")))
 			throw new Exception("数组访问越界");
 		stack.push(new Pair<>(new Terminal("标识符"),
 				("[" + laResult.get(i - 3).getValue() + " + " + index + "]")));
@@ -188,10 +182,32 @@ public class Translation
 	
 	public void printCode()
 	{
-		for (int i = 0; i < interCode.size(); i++)
+		for (int i = 0; i < getInterCode().size(); i++)
 		{
-			String code = interCode.get(i);
+			String code = getInterCode().get(i);
 			System.out.println(i + "\t\t" + code);
 		}
+	}
+	/**
+	 * 符号表
+	 */
+	public HashMap<String, String> getSymbols()
+	{
+		return symbols;
+	}
+	public void setSymbols(HashMap<String, String> symbols)
+	{
+		this.symbols = symbols;
+	}
+	/**
+	 * 最终的三地址码序列
+	 */
+	public LinkedList<String> getInterCode()
+	{
+		return interCode;
+	}
+	public void setInterCode(LinkedList<String> interCode)
+	{
+		this.interCode = interCode;
 	}
 }
