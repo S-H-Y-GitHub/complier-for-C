@@ -13,10 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Stack;
-@Deprecated
 public class Main
 {
-	@Deprecated
 	public static void main(String[] args) throws Exception
 	{
 		String filename = "";
