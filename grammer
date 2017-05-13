@@ -1,0 +1,59 @@
+﻿S`->S
+
+S->TYPE 标识符 ( ) { M1 A }
+
+M1-> 			{{invoke 标识符}}
+A->B A
+A->
+
+B->return EXPS ; M2
+M2-> 			{{return EXPS}}
+B->IF
+B->FOR
+B->DECL ;                   //声明语句
+B->ASSI ;                   //赋值语句
+B->标识符 ( EXPS M13 ARGS ) ; M14
+
+ARGS -> ,EXPS M13 ARGS
+ARGS -> 
+M13->
+
+ASSI->EXPS = EXPS 	  //表达式
+
+DECL->TYPE 标识符 M3
+M3->
+DECL->TYPE 标识符 [ 数字 ] M4
+M4->
+TYPE->int
+TYPE->char
+
+FOR->for(ASSI; M11 BOOL ;M9 ASSI){ M10 A}
+M9->
+M10->
+
+
+IF-> if(BOOL){ M7 A } M8 ELSE
+ELSE-> else{ A }
+ELSE->
+M7->
+M8->
+
+
+EXPS->EXPS OP EXPS M5
+M5->
+EXPS ->标识符 M6
+EXPS ->数字 M6
+EXPS ->字符串 M6
+EXPS ->字符 M6
+EXPS ->标识符 [ 数字 ] M12
+M6->
+OP->+ {{}}
+OP->-
+OP->*
+OP->/
+
+BOOL->EXPS JUG EXPS
+JUG-> ==
+JUG-> >
+JUG-> <
+JUG-> !=

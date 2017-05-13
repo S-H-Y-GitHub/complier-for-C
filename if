@@ -1,0 +1,6 @@
+﻿		if BOOL goto +2
+		goto L1
+		A
+L1:		goto L2
+		B
+L2:		...		

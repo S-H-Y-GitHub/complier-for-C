@@ -29,7 +29,7 @@ public class LexicalAnalyzer
 					if (buffer.substring(i, i + 1).matches("\\s"))
 						i++;
 					//处理单个的符号
-					else if (buffer.substring(i, i + 1).matches("#|;|\\)|\\(|\\{|}|\\.|\\[|]|:|\\?"))
+					else if (buffer.substring(i, i + 1).matches("#|;|\\)|\\(|\\{|}|\\.|\\[|]|:|\\?|,"))
 					{
 						symbols.add(new Pair<>(new Terminal(buffer.substring(i, i + 1)),buffer.substring(i, i + 1)));
 						i++;

@@ -35,7 +35,7 @@ public class Main
 					if (buffer.substring(i, i + 1).matches("\\s"))
 						i++;
 					//处理单个的符号
-					else if (buffer.substring(i, i + 1).matches("#|;|\\)|\\(|\\{|}|\\.|\\[|]|:|\\?"))
+					else if (buffer.substring(i, i + 1).matches("#|;|\\)|\\(|\\{|}|\\.|\\[|]|:|\\?|,"))
 					{
 						System.out.println("(\"" + buffer.substring(i, i + 1) + "\"\t" + buffer.substring(i, i + 1) + ")");
 						i++;

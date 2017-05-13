@@ -70,7 +70,7 @@ public class Translation
 		Pair<Terminal, String> p2 = stack.pop();
 		String p1type;
 		if (p1.getKey().s.equals("标识符"))
-			p1type = getSymbols().get(p1.getValue());
+			p1type = getSymbols().get(p1.getValue()) == null ? "int" : getSymbols().get(p1.getValue());
 		else if (p1.getKey().s.equals("数字"))
 			p1type = "int";
 		else
@@ -165,19 +165,22 @@ public class Translation
 	{
 		if (laResult.get(i - 3).getKey().s.equals("标识符") && !getSymbols().containsKey(laResult.get(i - 3).getValue()))
 			throw new Exception("引用了未定义的变量");
-		Integer index = Integer.valueOf(laResult.get(i - 1).getValue());
-		if (index > Integer.valueOf(getSymbols().get(laResult.get(i - 3).getValue()).replaceAll("\\D", "")))
-			throw new Exception("数组访问越界");
+		String index = stack.pop().getValue();
 		stack.push(new Pair<>(new Terminal("标识符"),
 				("[" + laResult.get(i - 3).getValue() + " + " + index + "]")));
 	}
+	public void M13(Integer i) throws Exception
+	{
+		String parm = stack.pop().getValue();
+		interCode.add("param " + parm);
+	}
 	public void M14(Integer i) throws Exception
 	{
-	
+		interCode.add("call " + stack.pop().getValue());
 	}
 	public void M15(Integer i) throws Exception
 	{
-	
+		stack.push(laResult.get(i));
 	}
 	
 	public void printCode()

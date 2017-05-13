@@ -2,6 +2,9 @@ package codeGenerator;
 
 import semanticAnalyzer.SemanticAnalyzer;
 
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Scanner;
@@ -25,14 +28,71 @@ public class Main
 		LinkedList<String> interCode = s.getInterCode();
 		symbols = s.getSymbols();
 		LinkedList<String> result = new LinkedList<>();
+		LinkedList<String> params = new LinkedList<>();
 		if (interCode == null)
 			return;
+		File file = new File("result.asm");
+		if (file.exists())
+			if (!file.delete())
+				throw new IOException("存在无法删除的result.asm文件或文件夹");
+		if (!file.createNewFile())
+			throw new IOException("result.asm创建失败");
+		FileWriter output = new FileWriter(file);
+		output.write(".586\n.model flat, stdcall\n.stack 4096\n" + "\n" +
+				"option casemap : none\n\nincludelib msvcrt.lib\n\n" +
+				"printf\t\t\tPROTO C : ptr byte, : vararg\n" + "scanf\t\t\tPROTO C : ptr byte, : vararg\n" +
+				"gets\t\t\t\tPROTO C : ptr byte\n" + "getchar\t\tPROTO C\n" + "_getche\t\tPROTO C\n" +
+				"ExitProcess\tPROTO, dwExitCode : DWORD; exit program\n" + "\n" + "\n" +
+				"chr$ MACRO any_text : VARARG\n" + "LOCAL txtname\n" + ".data\n" + "IFDEF __UNICODE__\n" +
+				"WSTR txtname, any_text\n" + "align 4\n" + ".code\n" +
+				"EXITM <OFFSET txtname>\n" + "ENDIF\n" + "txtname db any_text, 0\n" + "align 4\n" +
+				".code\n" + "EXITM <OFFSET txtname>\n" + "ENDM\n" + "\n" + ".data\n");
+		for (String vname : symbols.keySet())
+		{
+			String type = symbols.get(vname);
+			String asmCode = "\t";
+			asmCode += vname + "\t";
+			if (type.matches(".+\\[.+\\]"))
+			{
+				String t1 = type.split("\\[")[0];
+				String t2 = type.split("\\[")[1];
+				t2 = t2.replace("]", "");
+				if (t1.matches("int"))
+					asmCode += "sdword\t" + t2 + " dup(?)";
+				else
+					asmCode += "byte\t" + t2 + " dup(?)";
+			}
+			else
+			{
+				if (type.matches("int"))
+					asmCode += "sdword\t?";
+				else
+					asmCode += "byte\t?";
+			}
+			output.write(asmCode + "\n");
+		}
+		output.write(".code\n");
 		for (int i = 0; i < interCode.size(); i++)
 		{
 			String code = interCode.get(i);
-			if (code.matches("call.+"))
+			if (code.matches("call main"))
 			{
-				String asmCode = code.replace("call ", "invoke\t");
+				output.write("main PROC\n");
+			}
+			else if (code.matches("param .+"))
+			{
+				params.add(code.replace("param ", ""));
+			}
+			else if (code.matches("call.+"))
+			{
+				StringBuilder asmCode = new StringBuilder(code.replace("call ", "invoke\t"));
+				for (String param : params)
+				{
+					if (param.matches("\".+\""))
+						asmCode.append(", chr$(").append(param).append(")");
+					else
+						asmCode.append(", ").append(param);
+				}
 				result.add(i + ":\t\t" + asmCode);
 			}
 			else if (code.matches("return.+"))
@@ -131,7 +191,13 @@ public class Main
 			}
 		}
 		for (String code : result)
+		{
 			System.out.println(code);
+			output.write(code + "\n");
+		}
+		output.write("main\tendp\n\nend\tmain" + "\n");
+		output.flush();
+		output.close();
 	}
 	private static String getAsmType(String key)
 	{

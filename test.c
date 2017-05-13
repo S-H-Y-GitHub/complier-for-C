@@ -1,20 +1,28 @@
 int main()
 {
 	char a;
-	int b[13];
+	int b[9];
+	int sum;
+	int result;
 	int i;
-	b[3] = 0;
-	for(i = 0;i < 13; i=i+1)
+	sum = 0;
+	for (i = 0;i < 9; i = i + 1)
 	{
-        i = a + 1;
+		b[i] = i * 5;
 	}
-	if(i==100)
+	for (i = 0;i < 9; i = i + 1)
 	{
-	    a = 'c';
+		sum = sum + b[i];
+	}
+	if (i == 0)
+	{
+		a = 'c';
 	}
 	else
 	{
-	    a = 'd';
+		a = 'd';
 	}
+	result = sum / 9;
+	printf("%d, %c\n", result, a);
 	return 0;
 }
