@@ -1,18 +1,18 @@
 int main()
 {
 	char a;
-	int b[9];
+	int score[9];
 	int sum;
 	int result;
 	int i;
 	sum = 0;
 	for (i = 0;i < 9; i = i + 1)
 	{
-		b[i] = i * 5;
+		score[i] = i * 5;
 	}
 	for (i = 0;i < 9; i = i + 1)
 	{
-		sum = sum + b[i];
+		sum = sum + score[i];
 	}
 	if (i == 0)
 	{

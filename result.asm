@@ -32,12 +32,12 @@ ENDM
 .data
 	a	byte	?
 	_v7	sdword	?
-	b	sdword	9 dup(?)
 	_v9	sdword	?
 	i	sdword	?
 	sum	sdword	?
 	_b11	byte	?
 	result	sdword	?
+	score	sdword	9 dup(?)
 	_b5	byte	?
 	_b8	byte	?
 	_v12	sdword	?
@@ -60,7 +60,7 @@ main PROC
 		mov		dword ptr [_v7],eax
 10:		mov		eax,4
 		imul	ecx,eax,i
-		mov		dword ptr b[ecx],dword ptr [_v7]
+		mov		dword ptr score[ecx],dword ptr [_v7]
 11:		jmp		6
 12:		mov		dword ptr [i],0
 13:		cmp		dword ptr [i],9
@@ -72,7 +72,7 @@ main PROC
 17:		mov		dword ptr [i],_v9
 18:		jmp		13
 19:		mov		eax,dword ptr [sum]
-		add		eax,[b
+		add		eax,[score
 		mov		dword ptr [_v10],eax
 20:		mov		dword ptr [sum],_v10
 21:		jmp		16
@@ -89,6 +89,6 @@ main PROC
 33:		invoke	printf, chr$("%d, %c\n"), result, a
 34:		mov		eax,0
 		ret
-	main	endp
+main	endp
 
 end	main

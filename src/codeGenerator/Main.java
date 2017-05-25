@@ -195,7 +195,7 @@ public class Main
 			System.out.println(code);
 			output.write(code + "\n");
 		}
-		output.write("main\tendp\n\nend\tmain" + "\n");
+		output.write("main\tendp\n\nend\tmain\n");
 		output.flush();
 		output.close();
 	}
